@@ -1,0 +1,15 @@
+{
+  "name": "theochinomona-tech-server",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "zod": "^4.2.1"
+  }
+}
+

@@ -1,0 +1,25 @@
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="400" fill="#1e293b"/><g transform="translate(120, 120)">
+      <circle cx="80" cy="80" r="73.60000000000001" stroke="#6366F1" stroke-width="1.5" opacity="0.3" fill="none"/>
+      <circle cx="80" cy="40" r="6.4" fill="#6366F1"/>
+      <circle cx="80" cy="64" r="8" fill="#6366F1"/>
+      <circle cx="80" cy="88" r="9.6" fill="#818CF8"/>
+      <circle cx="80" cy="112" r="11.200000000000001" fill="#FFFFFF"/>
+      <circle cx="48" cy="40" r="6.4" fill="#6366F1"/>
+      <circle cx="112" cy="40" r="6.4" fill="#6366F1"/>
+      <line x1="48" y1="40" x2="112" y2="40" stroke="#6366F1" stroke-width="2"/>
+      <line x1="80" y1="40" x2="80" y2="112" stroke="#6366F1" stroke-width="2.5"/>
+      <circle cx="56" cy="72" r="4.8" fill="#94A3B8" opacity="0.7"/>
+      <circle cx="104" cy="72" r="4.8" fill="#94A3B8" opacity="0.7"/>
+      <circle cx="64" cy="99.2" r="5.6000000000000005" fill="#818CF8" opacity="0.8"/>
+      <circle cx="96" cy="99.2" r="5.6000000000000005" fill="#818CF8" opacity="0.8"/>
+      <line x1="80" y1="64" x2="56" y2="72" stroke="#94A3B8" stroke-width="1.5" opacity="0.5"/>
+      <line x1="80" y1="64" x2="104" y2="72" stroke="#94A3B8" stroke-width="1.5" opacity="0.5"/>
+      <line x1="80" y1="88" x2="64" y2="99.2" stroke="#818CF8" stroke-width="1.5" opacity="0.6"/>
+      <line x1="80" y1="88" x2="96" y2="99.2" stroke="#818CF8" stroke-width="1.5" opacity="0.6"/>
+      <path d="M 80 28.799999999999997 L 75.19999999999999 35.2 M 80 28.799999999999997 L 84.80000000000001 35.2" stroke="#6366F1" stroke-width="2" stroke-linecap="round"/>
+      <text x="28.799999999999997" y="83.2" fill="#6366F1" font-size="16" opacity="0.4">&lt;</text>
+      <text x="124.80000000000001" y="83.2" fill="#6366F1" font-size="16" opacity="0.4">/&gt;</text>
+      <path d="M 40 120 Q 80 136 120 120" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round"/>
+      <circle cx="80" cy="112" r="17.6" stroke="#818CF8" stroke-width="1" opacity="0.3" fill="none"/>
+      <circle cx="80" cy="112" r="24" stroke="#818CF8" stroke-width="0.5" opacity="0.15" fill="none"/>
+    </g></svg>
