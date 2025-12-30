@@ -3,13 +3,15 @@
  * Page for editing existing projects
  */
 
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { ClipboardList } from 'lucide-react'
 import { getProjectById, updateProject, type UpdateProjectInput } from '@/lib/db/projects'
 import { toast } from 'sonner'
 import ProjectForm from '@/components/admin/ProjectForm'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from '@/components/ui/button'
 
 export default function EditProjectPage() {
   const { id } = useParams<{ id: string }>()
@@ -100,9 +102,17 @@ export default function EditProjectPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-zinc-100">Edit Project</h1>
-        <p className="text-zinc-400 mt-1">Update project information</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-zinc-100">Edit Project</h1>
+          <p className="text-zinc-400 mt-1">Update project information</p>
+        </div>
+        <Link to={`/admin/projects/${id}/tracking`}>
+          <Button variant="outline">
+            <ClipboardList className="h-4 w-4 mr-2" />
+            Tracking & Phases
+          </Button>
+        </Link>
       </div>
 
       <Card>

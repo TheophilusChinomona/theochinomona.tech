@@ -26,8 +26,8 @@ export default function LoginPage() {
         // Redirect admins to admin dashboard
         navigate('/admin', { replace: true })
       } else {
-        // Redirect regular users to home
-        navigate('/', { replace: true })
+        // Redirect clients to client dashboard
+        navigate('/dashboard', { replace: true })
       }
     }
   }, [isAuthenticated, user, navigate, location])

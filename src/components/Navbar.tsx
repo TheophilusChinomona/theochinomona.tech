@@ -19,6 +19,7 @@ const navLinks = [
   { name: 'Home', href: '/' },
   { name: 'About', href: '/about' },
   { name: 'Portfolio', href: '/portfolio' },
+  { name: 'Track Project', href: '/track' },
   { name: 'Blog', href: '/blog' },
   { name: 'Contact', href: '/contact' },
 ]
@@ -39,8 +40,8 @@ export default function Navbar() {
     if (user?.role === 'admin') {
       return '/admin'
     }
-    // For clients, we could have a client dashboard in the future
-    return '/admin' // For now, all authenticated users go to admin
+    // Clients go to client dashboard
+    return '/dashboard'
   }
 
   const handleAuthClick = () => {

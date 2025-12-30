@@ -5,9 +5,10 @@
 
 import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Plus, Upload, Loader2 } from 'lucide-react'
+import { X, Plus, Upload, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,7 @@ import {
 } from '@/components/ui/select'
 import { uploadProjectThumbnail, checkStorageAvailability } from '@/lib/storage'
 import { type Project, type CreateProjectInput, type UpdateProjectInput } from '@/lib/db/projects'
+import { getClientUsers } from '@/lib/db/users'
 
 const projectFormSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200, 'Title must be at most 200 characters'),
@@ -36,6 +38,7 @@ const projectFormSchema = z.object({
   }),
   thumbnailFile: z.instanceof(File).optional(),
   client_name: z.string().optional(),
+  client_id: z.string().optional(),
   project_url: z.string().optional().refine((val) => !val || z.string().url().safeParse(val).success, {
     message: 'Must be a valid URL',
   }),
@@ -44,6 +47,7 @@ const projectFormSchema = z.object({
   }),
   completion_date: z.string().optional(),
   featured: z.boolean().default(false),
+  notifications_enabled: z.boolean().default(true),
   status: z.enum(['draft', 'published']).default('draft'),
 })
 
@@ -69,6 +73,12 @@ export default function ProjectForm({
   )
   const [techInput, setTechInput] = useState('')
 
+  // Fetch client users for the dropdown
+  const { data: clients = [] } = useQuery({
+    queryKey: ['client-users'],
+    queryFn: getClientUsers,
+  })
+
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
@@ -78,10 +88,12 @@ export default function ProjectForm({
       category: (project?.category as 'Web' | 'Mobile' | 'Full-Stack' | 'Design') || undefined,
       thumbnail: project?.thumbnail || '',
       client_name: project?.client_name || '',
+      client_id: project?.client_id || '',
       project_url: project?.project_url || '',
       github_url: project?.github_url || '',
       completion_date: project?.completion_date || '',
       featured: project?.featured || false,
+      notifications_enabled: project?.notifications_enabled ?? true,
       status: project?.status || 'draft',
     },
   })
@@ -172,10 +184,12 @@ export default function ProjectForm({
         category: data.category,
         thumbnail: thumbnailUrl,
         client_name: data.client_name || null,
+        client_id: data.client_id || null,
         project_url: data.project_url || null,
         github_url: data.github_url || null,
         completion_date: data.completion_date || null,
         featured: data.featured,
+        notifications_enabled: data.notifications_enabled,
         status: data.status,
       }
 
@@ -352,17 +366,58 @@ export default function ProjectForm({
         )}
       </div>
 
-      {/* Client Name */}
+      {/* Assign to Client User */}
+      <div className="space-y-2">
+        <Label htmlFor="client_id" className="text-zinc-300">
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Assign to Client
+          </div>
+        </Label>
+        <Select
+          onValueChange={(value) => {
+            setValue('client_id', value === 'none' ? '' : value)
+            // Auto-fill client name when selecting a user
+            if (value && value !== 'none') {
+              const selectedClient = clients.find(c => c.id === value)
+              if (selectedClient) {
+                setValue('client_name', `${selectedClient.name} ${selectedClient.surname}`)
+              }
+            }
+          }}
+          defaultValue={watch('client_id') || 'none'}
+        >
+          <SelectTrigger id="client_id" className="bg-zinc-950 border-zinc-800 text-zinc-100">
+            <SelectValue placeholder="Select a client (optional)" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">No client assigned</SelectItem>
+            {clients.map((client) => (
+              <SelectItem key={client.id} value={client.id}>
+                {client.name} {client.surname} ({client.email})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-sm text-zinc-400">
+          Assign a registered client to receive project updates
+        </p>
+      </div>
+
+      {/* Client Name (display name, can override) */}
       <div className="space-y-2">
         <Label htmlFor="client_name" className="text-zinc-300">
-          Client Name
+          Client Display Name
         </Label>
         <Input
           id="client_name"
           {...register('client_name')}
           className="bg-zinc-950 border-zinc-800 text-zinc-100"
-          placeholder="Client name (optional)"
+          placeholder="Client name for display (optional)"
         />
+        <p className="text-sm text-zinc-400">
+          This name is shown on the project. Auto-filled when assigning a client.
+        </p>
         {errors.client_name && (
           <p className="text-sm text-red-400">{errors.client_name.message}</p>
         )}
@@ -431,6 +486,22 @@ export default function ProjectForm({
             Featured
           </Label>
           <p className="text-sm text-zinc-400">Highlight this project on the portfolio page</p>
+        </div>
+      </div>
+
+      {/* Notifications Enabled */}
+      <div className="flex items-start space-x-3 space-y-0">
+        <Checkbox
+          id="notifications_enabled"
+          checked={watch('notifications_enabled')}
+          onCheckedChange={(checked) => setValue('notifications_enabled', checked as boolean)}
+          className="bg-zinc-950 border-zinc-800 mt-1"
+        />
+        <div className="space-y-1 leading-none">
+          <Label htmlFor="notifications_enabled" className="text-zinc-300 cursor-pointer">
+            Email Notifications
+          </Label>
+          <p className="text-sm text-zinc-400">Send email notifications to clients when phases are completed</p>
         </div>
       </div>
 

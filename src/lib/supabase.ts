@@ -1,52 +1,54 @@
 /**
  * Supabase client initialization
- * This file exports the Supabase client instance for use throughout the application
+ * Singleton pattern to prevent multiple clients during HMR
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// Debug logging in development
-if (import.meta.env.DEV) {
-  console.log('Supabase Config Check:', {
-    hasUrl: !!supabaseUrl,
-    hasKey: !!supabaseAnonKey,
-    urlLength: supabaseUrl?.length || 0,
-    keyLength: supabaseAnonKey?.length || 0,
-    urlPreview: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'missing',
-    keyPreview: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'missing',
-  })
-}
-
 if (!supabaseUrl || !supabaseAnonKey) {
-  const missing = []
-  if (!supabaseUrl) missing.push('VITE_SUPABASE_URL')
-  if (!supabaseAnonKey) missing.push('VITE_SUPABASE_ANON_KEY')
-  
-  throw new Error(
-    `Missing Supabase environment variables: ${missing.join(', ')}. ` +
-    'Please check your .env file and restart your dev server.'
-  )
+  throw new Error('Missing Supabase environment variables')
 }
 
-// Trim whitespace (common issue with .env files)
 const trimmedUrl = supabaseUrl.trim()
 const trimmedKey = supabaseAnonKey.trim()
 
-if (!trimmedUrl || !trimmedKey) {
-  throw new Error(
-    'Supabase environment variables are empty after trimming. ' +
-    'Please check your .env file for whitespace issues.'
-  )
+// Use a consistent storage key based on project ID
+const projectId = trimmedUrl.split('//')[1]?.split('.')[0] || 'local'
+const STORAGE_KEY = `sb-${projectId}-auth-token`
+
+// Singleton pattern - store client on window to survive HMR
+declare global {
+  interface Window {
+    __supabaseClient?: SupabaseClient
+  }
 }
 
-export const supabase = createClient(trimmedUrl, trimmedKey, {
-  auth: {
-    persistSession: true, // Persist sessions to localStorage
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-})
+function getSupabaseClient(): SupabaseClient {
+  // Return existing client if available (survives HMR)
+  if (typeof window !== 'undefined' && window.__supabaseClient) {
+    return window.__supabaseClient
+  }
 
+  // Create new client
+  const client = createClient(trimmedUrl, trimmedKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: STORAGE_KEY,
+      flowType: 'pkce',
+    },
+  })
+
+  // Store on window for HMR persistence
+  if (typeof window !== 'undefined') {
+    window.__supabaseClient = client
+  }
+
+  return client
+}
+
+export const supabase = getSupabaseClient()

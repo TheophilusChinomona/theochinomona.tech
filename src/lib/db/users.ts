@@ -18,69 +18,35 @@ export interface User {
 }
 
 /**
- * Get user by auth_user_id with timeout
+ * Get user by auth_user_id
+ * Simple query with timeout fallback
  */
 export async function getUserByAuthId(
   authUserId: string
 ): Promise<User | null> {
-  if (import.meta.env.DEV) {
-    console.log('getUserByAuthId - Querying for auth_user_id:', authUserId)
-  }
-
-  // Create a timeout promise
-  const timeoutMs = 5000
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => {
-      reject(new Error(`getUserByAuthId timed out after ${timeoutMs}ms`))
-    }, timeoutMs)
-  })
-
-  // Create the query promise
-  const queryPromise = supabase
-    .from('users')
-    .select('*')
-    .eq('auth_user_id', authUserId)
-    .single()
-
   try {
+    // Create a promise that rejects after timeout
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Query timeout')), 5000)
+    })
+
+    // Create the query promise
+    const queryPromise = supabase
+      .from('users')
+      .select('*')
+      .eq('auth_user_id', authUserId)
+      .maybeSingle()
+
     // Race between query and timeout
     const { data, error } = await Promise.race([queryPromise, timeoutPromise])
 
     if (error) {
-      if (import.meta.env.DEV) {
-        console.error('getUserByAuthId - Error:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        })
-      }
-      if (error.code === 'PGRST116') {
-        // No rows returned
-        return null
-      }
-      throw error
-    }
-
-    if (import.meta.env.DEV) {
-      console.log('getUserByAuthId - Success:', {
-        id: data?.id,
-        email: data?.email,
-        role: data?.role,
-      })
-    }
-
-    return data as User
-  } catch (error) {
-    if (import.meta.env.DEV) {
-      console.error('getUserByAuthId - Exception:', error)
-    }
-    // Return null on timeout instead of throwing to prevent auth from breaking
-    if (error instanceof Error && error.message.includes('timed out')) {
-      console.warn('getUserByAuthId - Query timed out, returning null')
       return null
     }
-    throw error
+
+    return data as User | null
+  } catch {
+    return null
   }
 }
 
@@ -168,6 +134,24 @@ export async function getAllUsers(): Promise<User[]> {
 }
 
 /**
+ * Get all client users from the database (admin only)
+ * Returns users with role='client' for project assignment
+ */
+export async function getClientUsers(): Promise<User[]> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('role', 'client')
+    .order('name', { ascending: true })
+
+  if (error) {
+    throw error
+  }
+
+  return data as User[]
+}
+
+/**
  * Update user information (admin only)
  */
 export async function updateUser(
@@ -232,18 +216,107 @@ export async function updateUserRole(
 
 /**
  * Delete user from the database (admin only)
+ * Uses Edge Function to properly delete from both auth.users and public.users
  */
 export async function deleteUser(userId: string): Promise<string> {
-  const { error } = await supabase.from('users').delete().eq('id', userId)
+  // Get Supabase URL from environment
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+  if (!supabaseUrl) {
+    throw new Error('Supabase URL not configured')
+  }
+
+  // Get current session for authentication
+  const {
+    data: { session },
+    error: sessionError,
+  } = await supabase.auth.getSession()
+
+  if (sessionError || !session) {
+    throw new Error('You must be logged in to delete users')
+  }
+
+  // Call the Edge Function
+  const functionUrl = `${supabaseUrl}/functions/v1/delete-user`
+
+  const response = await fetch(functionUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ userId }),
+  })
+
+  const result = await response.json()
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || 'Failed to delete user')
+  }
+
+  return userId
+}
+
+/**
+ * Update user profile (for users updating their own profile)
+ * Allows updating name, surname, and phone
+ */
+export async function updateUserProfile(
+  userId: string,
+  updates: {
+    name?: string
+    surname?: string
+    phone?: string | null
+  }
+): Promise<User> {
+  const { data, error } = await supabase
+    .from('users')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', userId)
+    .select()
+    .single()
 
   if (error) {
     if (error.code === 'PGRST116') {
       throw new Error('User not found')
     }
-    throw error
+    throw new Error(`Failed to update profile: ${error.message}`)
   }
 
-  return userId
+  return data as User
+}
+
+/**
+ * Change user password
+ * Uses Supabase auth API to update password
+ */
+export async function changePassword(newPassword: string): Promise<void> {
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  })
+
+  if (error) {
+    throw new Error(`Failed to change password: ${error.message}`)
+  }
+}
+
+/**
+ * Get user by ID
+ */
+export async function getUserById(userId: string): Promise<User | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error) {
+    throw new Error(`Failed to get user: ${error.message}`)
+  }
+
+  return data as User | null
 }
 
 /**

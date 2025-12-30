@@ -6,7 +6,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Search, MoreVertical, Edit, Trash2, Eye, Plus } from 'lucide-react'
+import { Search, MoreVertical, Edit, Trash2, Eye, Plus, ClipboardList } from 'lucide-react'
 import { getAllProjects, deleteProject, bulkDeleteProjects, type Project } from '@/lib/db/projects'
 import {
   Table,
@@ -294,6 +294,13 @@ export default function ProjectList() {
                             >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Project
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => navigate(`/admin/projects/${project.id}/tracking`)}
+                              className="cursor-pointer"
+                            >
+                              <ClipboardList className="h-4 w-4 mr-2" />
+                              Tracking & Phases
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem

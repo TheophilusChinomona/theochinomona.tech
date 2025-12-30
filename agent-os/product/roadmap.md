@@ -2,7 +2,7 @@
 
 ## Development Phases
 
-### 1. [ ] Multi-page Shell & Design System
+### 1. [x] Multi-page Shell & Design System
 
 Create Home, About, Projects, Portfolio, Blog, Contact with transparent navbar + reusable hero component using React + Tailwind + shadcn.
 
@@ -18,7 +18,7 @@ Supabase/Firebase auth, signup/login, role metadata prepared.
 
 ---
 
-### 3. [ ] Admin Dashboard Foundation
+### 3. [x] Admin Dashboard Foundation
 
 Protected admin-only UI, layout, basic controls + user list.
 
@@ -26,7 +26,7 @@ Protected admin-only UI, layout, basic controls + user list.
 
 ---
 
-### 4. [ ] Project & Portfolio Management
+### 4. [x] Project & Portfolio Management
 
 Project schema + CRUD in admin + public display with filters.
 
@@ -34,7 +34,7 @@ Project schema + CRUD in admin + public display with filters.
 
 ---
 
-### 5. [ ] Client Project Tracking System
+### 5. [x] Client Project Tracking System
 
 Create phases + tasks, generate tracking code, build tracking page.
 
@@ -44,13 +44,29 @@ Create phases + tasks, generate tracking code, build tracking page.
 
 ### 6. [ ] Client Dashboard Experience
 
-Logged-in users see their projects + summary + history.
+Client dashboard with top nav, project metrics, activity history, notifications with "What's New" release notes, and client settings.
 
-**Size:** `M`
+**Size:** `L`
 
 ---
 
-### 7. [ ] Hire Me & Pricing / Quote Builder
+### 7. [ ] Client Payments & Invoicing
+
+Stripe integration for payment gateway, invoice management, payment status, and checkout flow.
+
+**Size:** `L`
+
+---
+
+### 8. [ ] Real-time Client Messaging
+
+Direct messaging/chat between clients and admin with real-time updates.
+
+**Size:** `L`
+
+---
+
+### 9. [ ] Hire Me & Pricing / Quote Builder
 
 Guided selection → price estimation → structured request pipeline.
 
@@ -58,7 +74,7 @@ Guided selection → price estimation → structured request pipeline.
 
 ---
 
-### 8. [ ] Theme & Feature Toggles
+### 10. [ ] Theme & Feature Toggles
 
 Admin controls theme + toggles blog/features + apply globally.
 
@@ -68,11 +84,12 @@ Admin controls theme + toggles blog/features + apply globally.
 
 ## Phase Groupings
 
-| Phase     | Steps | Focus                |
-| --------- | ----- | -------------------- |
-| Foundation | 1–2   | Shell + Auth         |
-| Core      | 3–5   | Differentiator features |
-| Polish    | 6–8   | Power user features  |
+| Phase      | Steps | Focus                    |
+| ---------- | ----- | ------------------------ |
+| Foundation | 1–2   | Shell + Auth             |
+| Core       | 3–5   | Differentiator features  |
+| Client     | 6–8   | Client experience        |
+| Polish     | 9–10  | Power user features      |
 
 ---
 

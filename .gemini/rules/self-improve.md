@@ -1,0 +1,198 @@
+---
+description: Guidelines for continuously improving Gemini rules based on emerging code patterns and best practices.
+globs: 
+alwaysApply: true
+---
+# Rule Improvement Guidelines
+
+## Rule Improvement Triggers
+
+- New code patterns not covered by existing rules
+- Repeated similar implementations across files
+- Common error patterns that could be prevented
+- New libraries or tools being used consistently
+- Emerging best practices in the codebase
+
+## Analysis Process
+
+- Compare new code with existing rules
+- Identify patterns that should be standardized
+- Look for references to external documentation
+- Check for consistent error handling patterns
+- Monitor test patterns and coverage
+
+## Rule Updates
+
+### Add New Rules When:
+- A new technology/pattern is used in 3+ files
+- Common bugs could be prevented by a rule
+- Code reviews repeatedly mention the same feedback
+- New security or performance patterns emerge
+
+### Modify Existing Rules When:
+- Better examples exist in the codebase
+- Additional edge cases are discovered
+- Related rules have been updated
+- Implementation details have changed
+
+### Example Pattern Recognition (React Components):
+
+```typescript
+// If you see repeated component patterns like:
+export function FeaturePage() {
+  const { user } = useAuth()
+  const { data, isLoading } = useQuery({
+    queryKey: ['feature', user?.id],
+    queryFn: () => fetchFeatureData(user!.id),
+    enabled: !!user,
+  })
+  
+  if (isLoading) return <Skeleton />
+  if (!data) return null
+  
+  return (
+    <div className="space-y-6">
+      {/* Content */}
+    </div>
+  )
+}
+
+// Consider documenting:
+// - Query key naming conventions
+// - Loading state patterns
+// - Conditional query enabling
+// - Consistent spacing classes
+```
+
+### Example Pattern Recognition (Supabase Queries):
+
+```typescript
+// If you see repeated database patterns like:
+const { data, error } = await supabase
+  .from('projects')
+  .select('*, phases:project_phases(*)')
+  .eq('client_id', userId)
+  .order('created_at', { ascending: false })
+
+if (error) throw error
+return data
+
+// Consider adding to a supabase.md rule:
+// - Standard table relationships
+// - Common query patterns
+// - Error handling patterns
+// - RLS considerations
+```
+
+### Example Pattern Recognition (Forms):
+
+```typescript
+// If you see repeated form patterns like:
+const form = useForm<ProjectFormData>({
+  resolver: zodResolver(projectSchema),
+  defaultValues: {
+    title: '',
+    description: '',
+    status: 'draft',
+  },
+})
+
+const onSubmit = async (data: ProjectFormData) => {
+  try {
+    await createProject(data)
+    toast.success('Project created!')
+    navigate('/admin/projects')
+  } catch (error) {
+    toast.error('Failed to create project')
+  }
+}
+
+// Consider documenting:
+// - Form schema patterns
+// - Validation patterns
+// - Success/error handling
+// - Navigation after submit
+```
+
+### Example Pattern Recognition (Protected Routes):
+
+```typescript
+// If you see repeated protection patterns like:
+<ProtectedRoute requiredRole="admin">
+  <AdminLayout />
+</ProtectedRoute>
+
+// Consider documenting:
+// - Role-based access patterns
+// - Redirect behaviors
+// - Loading state handling
+```
+
+## Rule Quality Checks
+
+- Rules should be actionable and specific
+- Examples should come from actual code
+- References should be up to date
+- Patterns should be consistently enforced
+
+## Continuous Improvement
+
+- Monitor code review comments
+- Track common development questions
+- Update rules after major refactors
+- Add links to relevant documentation
+- Cross-reference related rules
+
+## Rule Deprecation
+
+- Mark outdated patterns as deprecated
+- Remove rules that no longer apply
+- Update references to deprecated rules
+- Document migration paths for old patterns
+
+## Documentation Updates
+
+- Keep examples synchronized with code
+- Update references to external docs
+- Maintain links between related rules
+- Document breaking changes
+
+## Project-Specific Patterns to Monitor
+
+### Frontend (React / TypeScript):
+- React Query usage patterns
+- Form handling with React Hook Form + Zod
+- shadcn/ui component customization
+- Authentication context usage
+- Protected route patterns
+- Page layout patterns
+
+### Database (Supabase):
+- Table relationship patterns
+- RLS policy patterns
+- Query patterns with joins
+- Error handling patterns
+- Edge function patterns
+
+### Testing (Vitest + RTL):
+- Component test patterns
+- Mock setup patterns
+- Integration test patterns
+- Test file naming conventions
+
+### Styling (Tailwind):
+- Brand color usage
+- Animation patterns
+- Responsive design patterns
+- Dark mode patterns
+
+### State Management:
+- Zustand store patterns
+- React Query cache patterns
+- Form state patterns
+
+---
+
+Follow [gemini-rules.md](.gemini/rules/gemini-rules.md) for proper rule formatting and structure.
+
+*Last Updated: December 2024*

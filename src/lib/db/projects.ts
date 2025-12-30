@@ -15,11 +15,13 @@ export interface Project {
   category: string
   thumbnail: string | null
   client_name: string | null
+  client_id: string | null
   project_url: string | null
   github_url: string | null
   completion_date: string | null
   featured: boolean
   status: ProjectStatus
+  notifications_enabled: boolean
   created_at: string
   updated_at: string
 }
@@ -31,11 +33,13 @@ export interface CreateProjectInput {
   category: string
   thumbnail?: string | null
   client_name?: string | null
+  client_id?: string | null
   project_url?: string | null
   github_url?: string | null
   completion_date?: string | null
   featured?: boolean
   status?: ProjectStatus
+  notifications_enabled?: boolean
 }
 
 export interface UpdateProjectInput {
@@ -45,11 +49,13 @@ export interface UpdateProjectInput {
   category?: string
   thumbnail?: string | null
   client_name?: string | null
+  client_id?: string | null
   project_url?: string | null
   github_url?: string | null
   completion_date?: string | null
   featured?: boolean
   status?: ProjectStatus
+  notifications_enabled?: boolean
 }
 
 /**
@@ -134,11 +140,13 @@ export async function createProject(data: CreateProjectInput): Promise<Project> 
       category: data.category,
       thumbnail: data.thumbnail || null,
       client_name: data.client_name || null,
+      client_id: data.client_id || null,
       project_url: data.project_url || null,
       github_url: data.github_url || null,
       completion_date: data.completion_date || null,
       featured: data.featured ?? false,
       status: data.status || 'draft',
+      notifications_enabled: data.notifications_enabled ?? true,
     })
     .select()
     .single()
