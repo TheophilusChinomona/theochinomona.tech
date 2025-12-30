@@ -29,35 +29,45 @@ describe('Navigation Flow Integration', () => {
     // Navigate to About - use first navbar link (desktop nav)
     const aboutLinks = screen.getAllByRole('link', { name: /^about$/i })
     const navbarAboutLink = aboutLinks[0] // First one should be navbar
-    await user.click(navbarAboutLink)
+    if (navbarAboutLink) {
+      await user.click(navbarAboutLink)
+    }
     await waitFor(() => {
       expect(screen.getByTestId('developer-timeline')).toBeInTheDocument()
     }, { timeout: 2000 })
 
     // Navigate to Portfolio - use first link found
     const portfolioLinks = screen.getAllByRole('link', { name: /^portfolio$/i })
-    await user.click(portfolioLinks[0])
+    if (portfolioLinks[0]) {
+      await user.click(portfolioLinks[0])
+    }
     await waitFor(() => {
       expect(screen.getByTestId('project-grid')).toBeInTheDocument()
     }, { timeout: 2000 })
 
     // Navigate to Blog
     const blogLinks = screen.getAllByRole('link', { name: /^blog$/i })
-    await user.click(blogLinks[0])
+    if (blogLinks[0]) {
+      await user.click(blogLinks[0])
+    }
     await waitFor(() => {
       expect(screen.getByText(/coming soon/i)).toBeInTheDocument()
     }, { timeout: 2000 })
 
     // Navigate to Contact
     const contactLinks = screen.getAllByRole('link', { name: /^contact$/i })
-    await user.click(contactLinks[0])
+    if (contactLinks[0]) {
+      await user.click(contactLinks[0])
+    }
     await waitFor(() => {
       expect(screen.getByLabelText(/name/i)).toBeInTheDocument()
     }, { timeout: 2000 })
 
     // Navigate back to Home
     const homeLinks = screen.getAllByRole('link', { name: /^home$/i })
-    await user.click(homeLinks[0])
+    if (homeLinks[0]) {
+      await user.click(homeLinks[0])
+    }
     await waitFor(() => {
       expect(screen.getByTestId('hero-full')).toBeInTheDocument()
     }, { timeout: 2000 })

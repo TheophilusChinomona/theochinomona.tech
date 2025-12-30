@@ -8,8 +8,6 @@ import {
   Smartphone, 
   Database, 
   Cloud, 
-  Zap,
-  Github,
   ExternalLink
 } from 'lucide-react'
 

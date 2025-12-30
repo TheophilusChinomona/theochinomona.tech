@@ -10,7 +10,7 @@ Create Home, About, Projects, Portfolio, Blog, Contact with transparent navbar +
 
 ---
 
-### 2. [ ] Authentication & User Accounts
+### 2. [x] Authentication & User Accounts
 
 Supabase/Firebase auth, signup/login, role metadata prepared.
 

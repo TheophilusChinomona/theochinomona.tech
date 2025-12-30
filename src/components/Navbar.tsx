@@ -1,9 +1,19 @@
 import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogOut, User, LayoutDashboard } from 'lucide-react'
 import { useScrollPosition } from '@/hooks/useScrollPosition'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
+import AuthModal from './AuthModal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -15,11 +25,45 @@ const navLinks = [
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const { scrolled } = useScrollPosition(50)
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAuthenticated, signOut } = useAuth()
 
   const toggleMenu = () => setMobileMenuOpen((prev) => !prev)
   const closeMenu = () => setMobileMenuOpen(false)
+  
+  // Get dashboard URL based on user role
+  const getDashboardUrl = () => {
+    if (user?.role === 'admin') {
+      return '/admin'
+    }
+    // For clients, we could have a client dashboard in the future
+    return '/admin' // For now, all authenticated users go to admin
+  }
+
+  const handleAuthClick = () => {
+    setAuthModalOpen(true)
+    closeMenu() // Close mobile menu if open
+  }
+
+  const handleLogout = async () => {
+    await signOut()
+    closeMenu()
+  }
+
+  // Get display name for authenticated user
+  const getUserDisplayName = () => {
+    if (!user) return ''
+    if (user.name && user.surname) {
+      return `${user.name} ${user.surname}`
+    }
+    if (user.name) {
+      return user.name
+    }
+    return user.email
+  }
 
   return (
     <nav
@@ -35,9 +79,14 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="text-xl font-bold text-white hover:text-indigo-400 transition-colors"
+            className="flex items-center h-16 hover:opacity-80 transition-opacity"
+            aria-label="Home"
           >
-            theo.dev
+            <img
+              src="/images/logos-svg/theochinomona-logo-transparent-accent.svg"
+              alt="theochinomona.tech"
+              className="h-40 w-auto"
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -59,6 +108,54 @@ export default function Navbar() {
                 </Link>
               )
             })}
+
+            {/* Desktop Auth Button */}
+            {isAuthenticated && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                    aria-label={`User menu for ${getUserDisplayName()}`}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    <span className="max-w-[120px] truncate">{getUserDisplayName()}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800">
+                  <div className="px-2 py-1.5 text-sm text-zinc-300">
+                    <div className="font-medium truncate">{getUserDisplayName()}</div>
+                    <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+                    <div className="text-xs text-zinc-600 capitalize">{user.role}</div>
+                  </div>
+                  <DropdownMenuSeparator className="bg-zinc-800" />
+                  <DropdownMenuItem
+                    onClick={() => navigate(getDashboardUrl())}
+                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-zinc-800" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-zinc-300 focus:bg-zinc-800 focus:text-white cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                onClick={handleAuthClick}
+                className="text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                aria-label="Login"
+              >
+                Login
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -102,10 +199,48 @@ export default function Navbar() {
                   </Link>
                 )
               })}
+
+              {/* Mobile Auth Button */}
+              {isAuthenticated && user ? (
+                <div className="pt-2 mt-2 border-t border-zinc-800 space-y-1">
+                  <div className="px-4 py-2 text-sm text-zinc-300">
+                    <div className="font-medium truncate">{getUserDisplayName()}</div>
+                    <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+                    <div className="text-xs text-zinc-600 capitalize">{user.role}</div>
+                  </div>
+                  <Link
+                    to={getDashboardUrl()}
+                    onClick={closeMenu}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
+                    aria-label="Logout"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAuthClick}
+                  className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
+                  aria-label="Login"
+                >
+                  Login
+                </button>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Auth Modal */}
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </nav>
   )
 }

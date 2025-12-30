@@ -1,7 +1,22 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Navbar from './Navbar'
+import { useAuth } from '@/hooks/useAuth'
+
+// Mock useAuth hook
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: vi.fn(),
+}))
+
+// Mock AuthModal
+vi.mock('@/components/AuthModal', () => ({
+  default: ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => (
+    <div data-testid="auth-modal" style={{ display: open ? 'block' : 'none' }}>
+      <button onClick={() => onOpenChange(false)}>Close Modal</button>
+    </div>
+  ),
+}))
 
 // Wrapper for Router context
 function renderWithRouter(ui: React.ReactElement) {
@@ -9,11 +24,27 @@ function renderWithRouter(ui: React.ReactElement) {
 }
 
 describe('Navbar', () => {
+  const mockSignOut = vi.fn()
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Default: not authenticated
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      session: null,
+      isLoading: false,
+      isAuthenticated: false,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: mockSignOut,
+    } as any)
+  })
+
   it('renders with all navigation links', () => {
     renderWithRouter(<Navbar />)
     
-    expect(screen.getByText('theo.dev')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument()
+    expect(screen.getByAltText('theochinomona.tech')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /portfolio/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument()
@@ -107,5 +138,91 @@ describe('Navbar', () => {
       expect(updatedNav.className).toContain('bg-zinc-950')
     }, { timeout: 1000 })
   })
-})
 
+  // Auth button tests
+  it('renders auth button in desktop navigation when not authenticated', () => {
+    renderWithRouter(<Navbar />)
+    
+    const authButton = screen.getByRole('button', { name: /login/i })
+    expect(authButton).toBeInTheDocument()
+  })
+
+  it('renders auth button in mobile menu when not authenticated', () => {
+    renderWithRouter(<Navbar />)
+    
+    // Open mobile menu
+    const menuButton = screen.getByRole('button', { name: /toggle menu/i })
+    fireEvent.click(menuButton)
+    
+    // Check for auth button in mobile menu
+    const mobileMenu = screen.getByTestId('mobile-menu')
+    const authButton = mobileMenu.querySelector('button[aria-label*="login" i]')
+    expect(authButton).toBeInTheDocument()
+  })
+
+  it('opens auth modal when login button is clicked', () => {
+    renderWithRouter(<Navbar />)
+    
+    const authButton = screen.getByRole('button', { name: /login/i })
+    fireEvent.click(authButton)
+    
+    // Modal should be open
+    expect(screen.getByTestId('auth-modal')).toBeInTheDocument()
+  })
+
+  it('shows user name when authenticated', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: '1',
+        auth_user_id: 'auth-1',
+        name: 'John',
+        surname: 'Doe',
+        email: 'john@example.com',
+        phone: null,
+        role: 'client',
+        created_at: '',
+        updated_at: '',
+        supabaseUser: {} as any,
+      },
+      session: {} as any,
+      isLoading: false,
+      isAuthenticated: true,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: mockSignOut,
+    } as any)
+
+    renderWithRouter(<Navbar />)
+    
+    // Should show user name or email
+    expect(screen.getByText(/john/i)).toBeInTheDocument()
+  })
+
+  it('shows user email when authenticated and name is not available', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: {
+        id: '1',
+        auth_user_id: 'auth-1',
+        name: '',
+        surname: '',
+        email: 'user@example.com',
+        phone: null,
+        role: 'client',
+        created_at: '',
+        updated_at: '',
+        supabaseUser: {} as any,
+      },
+      session: {} as any,
+      isLoading: false,
+      isAuthenticated: true,
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: mockSignOut,
+    } as any)
+
+    renderWithRouter(<Navbar />)
+    
+    // Should show email
+    expect(screen.getByText(/user@example\.com/i)).toBeInTheDocument()
+  })
+})

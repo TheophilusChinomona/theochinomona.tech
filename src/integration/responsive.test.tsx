@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import AppRoutes from '@/routes'
 import Navbar from '@/components/Navbar'
 
 // Mock react-parallax-mouse
@@ -35,7 +34,6 @@ describe('Responsive Behavior', () => {
     expect(menuButton).not.toHaveClass('hidden')
     
     // Desktop nav links should be hidden on mobile
-    const desktopNav = screen.queryByRole('link', { name: /home/i })
     // On mobile, links are in the mobile menu, not in desktop nav
     // The desktop nav container should have 'hidden md:flex'
     const navContainer = screen.getByRole('navigation').querySelector('.hidden.md\\:flex')

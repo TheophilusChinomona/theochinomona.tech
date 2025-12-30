@@ -1,13 +1,13 @@
 import Hero from '@/components/Hero'
 import DeveloperTimeline, { type TimelineItem } from '@/components/DeveloperTimeline'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
   Code, 
   Database, 
   Cloud, 
   Smartphone,
   Palette,
-  Zap
+  Zap,
 } from 'lucide-react'
 
 const skills = [

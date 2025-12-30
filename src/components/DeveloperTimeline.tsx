@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +35,7 @@ export default function DeveloperTimeline({ items, className }: DeveloperTimelin
       x: 0,
       transition: {
         duration: 0.5,
-        ease: 'easeOut',
+        ease: [0.4, 0, 0.2, 1] as const,
       },
     },
   }

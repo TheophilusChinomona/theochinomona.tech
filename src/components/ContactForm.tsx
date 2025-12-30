@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const contactFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
