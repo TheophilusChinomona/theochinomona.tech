@@ -101,11 +101,13 @@ describe('ProjectForm', () => {
       category: 'Web',
       thumbnail: 'https://example.com/image.jpg',
       client_name: 'Test Client',
+      client_id: null,
       project_url: 'https://example.com',
       github_url: 'https://github.com/example',
       completion_date: '2025-12-01',
       featured: true,
       status: 'published',
+      notifications_enabled: true,
       created_at: '2025-12-30T00:00:00Z',
       updated_at: '2025-12-30T00:00:00Z',
     }
@@ -180,7 +182,7 @@ describe('ProjectForm', () => {
     // Upload image file
     const file = new File(['image content'], 'test.jpg', { type: 'image/jpeg' })
     const fileInput = screen.getByLabelText(/thumbnail/i).querySelector('input[type="file"]')
-    if (fileInput) {
+    if (fileInput && fileInput instanceof HTMLInputElement) {
       await user.upload(fileInput, file)
     }
 

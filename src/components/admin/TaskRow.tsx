@@ -54,12 +54,16 @@ export default function TaskRow({ task, projectId }: TaskRowProps) {
   })
 
   const handleSliderChange = (value: number[]) => {
-    setLocalPercentage(value[0])
+    const newValue = value[0]
+    if (newValue !== undefined) {
+      setLocalPercentage(newValue)
+    }
   }
 
   const handleSliderCommit = (value: number[]) => {
-    if (value[0] !== task.completion_percentage) {
-      updateCompletionMutation.mutate(value[0])
+    const newValue = value[0]
+    if (newValue !== undefined && newValue !== task.completion_percentage) {
+      updateCompletionMutation.mutate(newValue)
     }
   }
 
@@ -88,7 +92,7 @@ export default function TaskRow({ task, projectId }: TaskRowProps) {
             {task.developer_notes && (
               <MessageSquare
                 className="h-4 w-4 text-zinc-500 flex-shrink-0"
-                title="Has developer notes"
+                aria-label="Has developer notes"
               />
             )}
           </div>

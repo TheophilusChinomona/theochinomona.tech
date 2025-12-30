@@ -28,6 +28,8 @@ import ClientSettingsPage from './pages/client/ClientSettingsPage'
 import NotificationsPage from './pages/client/NotificationsPage'
 import BillingPage from './pages/client/BillingPage'
 import ClientInvoiceDetailPage from './pages/client/InvoiceDetailPage'
+import ClientCreateProjectPage from './pages/client/CreateProjectPage'
+import MyRequestsPage from './pages/client/MyRequestsPage'
 import ReleaseNotesPage from './pages/admin/ReleaseNotesPage'
 import CreateReleaseNotePage from './pages/admin/CreateReleaseNotePage'
 import EditReleaseNotePage from './pages/admin/EditReleaseNotePage'
@@ -105,7 +107,9 @@ export default function AppRoutes() {
       >
         <Route index element={<ClientDashboardHome />} />
         <Route path="projects" element={<MyProjectsPage />} />
+        <Route path="projects/new" element={<ClientCreateProjectPage />} />
         <Route path="projects/:id" element={<ClientProjectDetailPage />} />
+        <Route path="requests" element={<MyRequestsPage />} />
         <Route path="portfolio" element={<ClientPortfolioPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="billing/:id" element={<ClientInvoiceDetailPage />} />

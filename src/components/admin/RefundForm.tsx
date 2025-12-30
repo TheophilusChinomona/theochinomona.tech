@@ -53,7 +53,7 @@ const REFUND_REASONS = [
 
 export default function RefundForm({
   payment,
-  invoiceTotal,
+  invoiceTotal: _invoiceTotal,
   onSubmit,
   onCancel,
   isSubmitting = false,

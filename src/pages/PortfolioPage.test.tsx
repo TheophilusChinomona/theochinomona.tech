@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import PortfolioPage from './PortfolioPage'
-import { getPublishedProjects } from '@/lib/db/projects'
+import { getPublishedProjects, type Project } from '@/lib/db/projects'
 
 // Mock the database function
 vi.mock('@/lib/db/projects', () => ({
@@ -28,7 +28,7 @@ function renderWithProviders(ui: React.ReactElement) {
 describe('PortfolioPage', () => {
   const mockGetPublishedProjects = vi.mocked(getPublishedProjects)
 
-  const mockDbProjects = [
+  const mockDbProjects: Project[] = [
     {
       id: 'db-1',
       title: 'Database Project 1',
@@ -37,11 +37,13 @@ describe('PortfolioPage', () => {
       category: 'Web',
       thumbnail: 'https://example.com/db1.jpg',
       client_name: 'Test Client',
+      client_id: null,
       project_url: 'https://example.com/project1',
       github_url: 'https://github.com/example/project1',
       completion_date: '2025-12-01',
       featured: true,
-      status: 'published' as const,
+      status: 'published',
+      notifications_enabled: true,
       created_at: '2025-12-30T00:00:00Z',
       updated_at: '2025-12-30T00:00:00Z',
     },
@@ -53,11 +55,13 @@ describe('PortfolioPage', () => {
       category: 'Mobile',
       thumbnail: null,
       client_name: null,
+      client_id: null,
       project_url: null,
       github_url: null,
       completion_date: null,
       featured: false,
-      status: 'published' as const,
+      status: 'published',
+      notifications_enabled: true,
       created_at: '2025-12-29T00:00:00Z',
       updated_at: '2025-12-29T00:00:00Z',
     },
@@ -200,6 +204,8 @@ describe('PortfolioPage', () => {
       completion_date: null,
       featured: false,
       status: 'published' as const,
+      client_id: null,
+      notifications_enabled: true,
       created_at: '2025-12-30T00:00:00Z',
       updated_at: '2025-12-30T00:00:00Z',
     }))
@@ -235,10 +241,14 @@ describe('PortfolioPage', () => {
 
   it('only displays published projects from database', async () => {
     // Mock only published projects
-    const publishedOnly = [
+    const baseProject = mockDbProjects[0]
+    if (!baseProject) {
+      throw new Error('mockDbProjects[0] is undefined')
+    }
+    const publishedOnly: Project[] = [
       {
-        ...mockDbProjects[0],
-        status: 'published' as const,
+        ...baseProject,
+        status: 'published',
       },
     ]
 

@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import EditProjectPage from './EditProjectPage'
-import { getProjectById, updateProject } from '@/lib/db/projects'
+import { getProjectById, updateProject, type Project } from '@/lib/db/projects'
 
 // Mock the database functions
 vi.mock('@/lib/db/projects', () => ({
@@ -46,7 +46,7 @@ describe('EditProjectPage', () => {
   const mockGetProjectById = vi.mocked(getProjectById)
   const mockUpdateProject = vi.mocked(updateProject)
 
-  const mockProject = {
+  const mockProject: Project = {
     id: '123',
     title: 'Existing Project',
     description: 'Existing description',
@@ -54,11 +54,13 @@ describe('EditProjectPage', () => {
     category: 'Web',
     thumbnail: 'https://example.com/image.jpg',
     client_name: 'Test Client',
+    client_id: null,
     project_url: 'https://example.com',
     github_url: 'https://github.com/example',
     completion_date: '2025-12-01',
     featured: true,
-    status: 'published' as const,
+    status: 'published',
+    notifications_enabled: true,
     created_at: '2025-12-30T00:00:00Z',
     updated_at: '2025-12-30T00:00:00Z',
   }

@@ -116,7 +116,6 @@ export default function ProjectList() {
   )
 
   const allSelected = projects && projects.length > 0 && selectedProjects.size === projects.length
-  const someSelected = selectedProjects.size > 0 && selectedProjects.size < (projects?.length ?? 0)
 
   if (error) {
     return (

@@ -50,7 +50,7 @@ describe('Subscription and Tax Schema', () => {
         insert: mockInsert,
       } as any)
 
-      const result = await supabase.from('subscriptions').insert({
+      await supabase.from('subscriptions').insert({
         client_id: '123e4567-e89b-12d3-a456-426614174000',
         stripe_subscription_id: 'sub_1234567890',
         stripe_price_id: 'price_1234567890',
@@ -126,7 +126,7 @@ describe('Subscription and Tax Schema', () => {
       mockSelect.mockReturnValue(mockResolved)
 
       // Simulate client access attempt
-      const result = await supabase.from('subscriptions').select('*')
+      await supabase.from('subscriptions').select('*')
 
       expect(supabase.from).toHaveBeenCalledWith('subscriptions')
       // In real scenario, this would be rejected by RLS

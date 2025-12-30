@@ -4,13 +4,15 @@
  */
 
 import { useState, useMemo } from 'react'
-import { FolderKanban, Filter, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { FolderKanban, Filter, Search, Plus } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/hooks/useAuth'
 import { getProjectsByClientId } from '@/lib/db/clientProjects'
 import { supabase } from '@/lib/supabase'
 import ClientProjectCard from '@/components/client/ClientProjectCard'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -24,6 +26,7 @@ type SortOption = 'date-desc' | 'date-asc' | 'name-asc' | 'name-desc'
 
 export default function MyProjectsPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
   const [sortBy, setSortBy] = useState<SortOption>('date-desc')
   const [searchQuery, setSearchQuery] = useState('')
@@ -118,11 +121,20 @@ export default function MyProjectsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-100">My Projects</h1>
-        <p className="text-zinc-400 mt-1">
-          View and track all projects assigned to you.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-100">My Projects</h1>
+          <p className="text-zinc-400 mt-1">
+            View and track all projects assigned to you.
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate('/dashboard/projects/new')}
+          className="bg-indigo-600 hover:bg-indigo-700"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Create Project
+        </Button>
       </div>
 
       {/* Filters */}

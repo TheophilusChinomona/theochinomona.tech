@@ -25,7 +25,10 @@ import { Loader2 } from 'lucide-react'
 const addTaskSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
-  completion_percentage: z.coerce.number().min(0).max(100).optional(),
+  completion_percentage: z.preprocess(
+    (val) => (val === '' || val === undefined ? undefined : Number(val)),
+    z.number().min(0).max(100).optional()
+  ),
   developer_notes: z.string().optional(),
 })
 
@@ -40,7 +43,7 @@ interface AddTaskDialogProps {
 
 export default function AddTaskDialog({
   phaseId,
-  projectId,
+  projectId: _projectId,
   open,
   onOpenChange,
 }: AddTaskDialogProps) {
@@ -52,7 +55,7 @@ export default function AddTaskDialog({
     formState: { errors },
     reset,
   } = useForm<AddTaskFormData>({
-    resolver: zodResolver(addTaskSchema),
+    resolver: zodResolver(addTaskSchema) as any,
     defaultValues: {
       name: '',
       description: '',
@@ -93,7 +96,7 @@ export default function AddTaskDialog({
             Create a new task for this phase.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-zinc-300">
               Task Name *

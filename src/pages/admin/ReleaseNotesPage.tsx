@@ -18,7 +18,7 @@ import {
   User,
   Loader2,
 } from 'lucide-react'
-import { getAllReleaseNotes, deleteReleaseNote, publishReleaseNote, updateReleaseNote } from '@/lib/db/releaseNotes'
+import { getAllReleaseNotes, deleteReleaseNote, publishReleaseNote, unpublishReleaseNote } from '@/lib/db/releaseNotes'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -84,7 +84,7 @@ export default function ReleaseNotesPage() {
   const togglePublishMutation = useMutation({
     mutationFn: async (note: ReleaseNote) => {
       if (note.is_published) {
-        return updateReleaseNote(note.id, { is_published: false })
+        return unpublishReleaseNote(note.id)
       } else {
         return publishReleaseNote(note.id)
       }

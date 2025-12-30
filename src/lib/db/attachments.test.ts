@@ -68,8 +68,8 @@ describe('Attachments Database Helpers', () => {
       const result = await getAttachmentsByProjectId('proj-123')
 
       expect(result).toHaveLength(2)
-      expect(result[0].file_type).toBe('image')
-      expect(result[1].file_type).toBe('pdf')
+      expect(result[0]?.file_type).toBe('image')
+      expect(result[1]?.file_type).toBe('pdf')
     })
   })
 
@@ -101,7 +101,7 @@ describe('Attachments Database Helpers', () => {
       const result = await getAttachmentsByPhaseId('phase-1')
 
       expect(result).toHaveLength(1)
-      expect(result[0].phase_id).toBe('phase-1')
+      expect(result[0]?.phase_id).toBe('phase-1')
     })
   })
 
@@ -133,7 +133,7 @@ describe('Attachments Database Helpers', () => {
       const result = await getAttachmentsByTaskId('task-1')
 
       expect(result).toHaveLength(1)
-      expect(result[0].task_id).toBe('task-1')
+      expect(result[0]?.task_id).toBe('task-1')
     })
   })
 

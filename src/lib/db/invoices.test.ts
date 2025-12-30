@@ -63,7 +63,7 @@ describe('Invoice Schema', () => {
         insert: mockInsert,
       } as any)
 
-      const result = await supabase.from('invoices').insert({
+      await supabase.from('invoices').insert({
         invoice_number: 'INV-001',
         client_id: '123e4567-e89b-12d3-a456-426614174000',
         subtotal: 10000,

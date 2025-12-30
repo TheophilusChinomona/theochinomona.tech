@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import CreateProjectPage from './CreateProjectPage'
-import { createProject } from '@/lib/db/projects'
+import { createProject, type Project } from '@/lib/db/projects'
 
 // Mock the database function
 vi.mock('@/lib/db/projects', () => ({
@@ -57,7 +57,7 @@ describe('CreateProjectPage', () => {
 
   it('navigates to project list after successful creation', async () => {
     const user = userEvent.setup()
-    const mockProject = {
+    const mockProject: Project = {
       id: '123',
       title: 'New Project',
       description: 'Description',
@@ -65,11 +65,13 @@ describe('CreateProjectPage', () => {
       category: 'Web',
       thumbnail: null,
       client_name: null,
+      client_id: null,
       project_url: null,
       github_url: null,
       completion_date: null,
       featured: false,
-      status: 'draft' as const,
+      status: 'draft',
+      notifications_enabled: true,
       created_at: '2025-12-30T00:00:00Z',
       updated_at: '2025-12-30T00:00:00Z',
     }

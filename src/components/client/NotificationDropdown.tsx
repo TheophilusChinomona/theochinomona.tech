@@ -32,7 +32,7 @@ export default function NotificationDropdown() {
 
   const { data: notifications, isLoading: notificationsLoading } = useNotifications(10)
   const { data: unreadCount = 0 } = useUnreadCount()
-  const { data: releaseNotes, isLoading: releaseNotesLoading } = useReleaseNotes()
+  const { data: releaseNotes } = useReleaseNotes()
   const markNotificationRead = useMarkNotificationRead()
   const markAllRead = useMarkAllNotificationsRead()
   const markReleaseNoteRead = useMarkReleaseNoteRead()

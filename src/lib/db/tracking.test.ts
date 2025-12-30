@@ -17,7 +17,6 @@ import {
   type ProjectTask,
   type ProjectAttachment,
   type ClientNotificationPreference,
-  type ProjectWithDetails,
 } from './tracking'
 import { supabase } from '@/lib/supabase'
 
@@ -57,11 +56,13 @@ describe('Tracking Database Helpers', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
       }
@@ -79,6 +80,7 @@ describe('Tracking Database Helpers', () => {
           actual_end_date: null,
           status: 'pending',
           notify_on_complete: true,
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -93,6 +95,7 @@ describe('Tracking Database Helpers', () => {
           sort_order: 0,
           completion_percentage: 50,
           developer_notes: 'In progress',
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -166,7 +169,7 @@ describe('Tracking Database Helpers', () => {
       expect(result?.title).toBe('Test Project')
       expect(result?.tracking_code?.code).toBe('TC-ABC123')
       expect(result?.phases).toHaveLength(1)
-      expect(result?.phases[0].tasks).toHaveLength(1)
+      expect(result?.phases[0]?.tasks).toHaveLength(1)
     })
 
     it('should return null for invalid tracking code', async () => {
@@ -319,8 +322,8 @@ describe('Tracking Database Helpers', () => {
       const result = await getAllTrackingCodesByProjectId('proj-123')
 
       expect(result).toHaveLength(2)
-      expect(result[0].is_active).toBe(true)
-      expect(result[1].is_active).toBe(false)
+      expect(result[0]?.is_active).toBe(true)
+      expect(result[1]?.is_active).toBe(false)
     })
   })
 
@@ -391,7 +394,7 @@ describe('Tracking Database Helpers', () => {
       const result = await getOptedInNotificationPreferences('tc-123')
 
       expect(result).toHaveLength(1)
-      expect(result[0].opted_in).toBe(true)
+      expect(result[0]?.opted_in).toBe(true)
     })
   })
 

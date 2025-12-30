@@ -6,7 +6,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   createInvoice,
-  getInvoiceById,
   getInvoicesForClient,
   updateInvoiceStatus,
   getInvoiceWithLineItems,
@@ -111,7 +110,7 @@ describe('Invoice Database Functions', () => {
       expect(lineItemsInsertCalled).toBe(true)
       expect(result.id).toBe('invoice-123')
       expect(result.line_items).toHaveLength(1)
-      expect(result.line_items[0].description).toBe('Service 1')
+      expect(result.line_items[0]?.description).toBe('Service 1')
     })
   })
 
@@ -249,8 +248,8 @@ describe('Invoice Database Functions', () => {
       expect(result).not.toBeNull()
       if (result) {
         expect(result.line_items).toHaveLength(2)
-        expect(result.line_items[0].description).toBe('Service 1')
-        expect(result.line_items[1].description).toBe('Service 2')
+        expect(result.line_items[0]?.description).toBe('Service 1')
+        expect(result.line_items[1]?.description).toBe('Service 2')
       }
     })
   })

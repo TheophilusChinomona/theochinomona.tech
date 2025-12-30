@@ -22,14 +22,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { getClientUsers } from '@/lib/db/users'
 import { getAllProjects } from '@/lib/db/projects'
 import { getPhasesByProjectId } from '@/lib/db/phases'
 import { getTasksByPhaseIds } from '@/lib/db/tasks'
 import { getActiveTaxRates } from '@/lib/db/taxRates'
-import { calculateInvoiceTotal } from '@/lib/db/invoices'
 import { generateInvoiceNumber } from '@/lib/db/invoices'
 import type {
   Invoice,
@@ -112,24 +110,8 @@ export default function InvoiceForm({
     queryFn: getActiveTaxRates,
   })
 
-  // Fetch phases when project is selected
-  const selectedProjectId = form.watch('project_id')
-  const { data: phases = [] } = useQuery({
-    queryKey: ['phases', selectedProjectId],
-    queryFn: () => (selectedProjectId ? getPhasesByProjectId(selectedProjectId) : []),
-    enabled: !!selectedProjectId,
-  })
-
-  // Fetch tasks when phases are available
-  const phaseIds = phases.map((p) => p.id)
-  const { data: tasks = [] } = useQuery({
-    queryKey: ['tasks', phaseIds],
-    queryFn: () => (phaseIds.length > 0 ? getTasksByPhaseIds(phaseIds) : []),
-    enabled: phaseIds.length > 0,
-  })
-
   const form = useForm<InvoiceFormData>({
-    resolver: zodResolver(invoiceFormSchema),
+    resolver: zodResolver(invoiceFormSchema) as any,
     defaultValues: {
       client_id: invoice?.client_id || '',
       project_id: invoice?.project_id || '',
@@ -153,6 +135,22 @@ export default function InvoiceForm({
       is_recurring: false,
       recurring_interval: undefined,
     },
+  })
+
+  // Fetch phases when project is selected
+  const selectedProjectId = form.watch('project_id')
+  const { data: phases = [] } = useQuery({
+    queryKey: ['phases', selectedProjectId],
+    queryFn: () => (selectedProjectId ? getPhasesByProjectId(selectedProjectId) : []),
+    enabled: !!selectedProjectId,
+  })
+
+  // Fetch tasks when phases are available
+  const phaseIds = phases.map((p) => p.id)
+  const { data: tasks = [] } = useQuery({
+    queryKey: ['tasks', phaseIds],
+    queryFn: () => (phaseIds.length > 0 ? getTasksByPhaseIds(phaseIds) : []),
+    enabled: phaseIds.length > 0,
   })
 
   const { fields, append, remove, update } = useFieldArray({
@@ -189,7 +187,14 @@ export default function InvoiceForm({
       return
     }
 
-    const newLineItems: CreateInvoiceLineItemInput[] = []
+    const newLineItems: Array<{
+      description: string
+      quantity: number
+      unit_price: number
+      total: number
+      phase_id: string | null
+      task_id: string | null
+    }> = []
 
     // Add phases with estimated_cost
     phases.forEach((phase: ProjectPhase) => {
@@ -222,7 +227,7 @@ export default function InvoiceForm({
 
     if (newLineItems.length > 0) {
       // Replace existing line items
-      form.setValue('line_items', newLineItems)
+      form.setValue('line_items', newLineItems as any)
       setAutoPopulated(true)
     }
   }
@@ -271,7 +276,7 @@ export default function InvoiceForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+    <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-6">
       {/* Basic Information */}
       <Card>
         <CardHeader>
@@ -306,9 +311,9 @@ export default function InvoiceForm({
             <div className="space-y-2">
               <Label htmlFor="project_id">Project (Optional)</Label>
               <Select
-                value={form.watch('project_id') || ''}
+                value={form.watch('project_id') || 'none'}
                 onValueChange={(value) => {
-                  form.setValue('project_id', value || undefined)
+                  form.setValue('project_id', value === 'none' ? undefined : value)
                   setAutoPopulated(false)
                 }}
                 disabled={isSubmitting}
@@ -317,7 +322,7 @@ export default function InvoiceForm({
                   <SelectValue placeholder="Select a project" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No project</SelectItem>
+                  <SelectItem value="none">No project</SelectItem>
                   {projects
                     .filter((p) => p.client_id === form.watch('client_id'))
                     .map((project) => (
@@ -502,15 +507,15 @@ export default function InvoiceForm({
             <div className="space-y-2">
               <Label htmlFor="tax_rate_id">Tax Rate</Label>
               <Select
-                value={form.watch('tax_rate_id') || ''}
-                onValueChange={(value) => form.setValue('tax_rate_id', value || undefined)}
+                value={form.watch('tax_rate_id') || 'none'}
+                onValueChange={(value) => form.setValue('tax_rate_id', value === 'none' ? undefined : value)}
                 disabled={isSubmitting}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No tax" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No tax</SelectItem>
+                  <SelectItem value="none">No tax</SelectItem>
                   {taxRates.map((rate) => (
                     <SelectItem key={rate.id} value={rate.id}>
                       {rate.name} ({rate.rate}%)

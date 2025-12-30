@@ -5,8 +5,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, X, FileImage, FileText, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Upload, FileImage, FileText, Loader2 } from 'lucide-react'
 import { uploadAttachment, detectAttachmentType } from '@/lib/attachmentStorage'
 import { createAttachment } from '@/lib/db/attachments'
 import { toast } from 'sonner'

@@ -28,7 +28,7 @@ const tabs: { id: SettingsTab; label: string; icon: typeof User }[] = [
 
 export default function ClientSettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile')
-  const { user, refreshUser } = useAuth()
+  const { user } = useAuth()
   const queryClient = useQueryClient()
 
   // Profile form state
@@ -57,7 +57,7 @@ export default function ClientSettingsPage() {
       user?.id ? updateUserProfile(user.id, data) : Promise.reject('No user'),
     onSuccess: () => {
       toast.success('Profile updated successfully')
-      refreshUser()
+      queryClient.invalidateQueries({ queryKey: ['user'] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to update profile')

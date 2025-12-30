@@ -5,7 +5,7 @@
 
 import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut, LayoutDashboard, Users, FolderKanban, Settings, Home, ClipboardList, Megaphone, UsersRound } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, Users, FolderKanban, Settings, Home, ClipboardList, Megaphone, UsersRound, FileText } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
@@ -25,6 +25,7 @@ const adminNavLinks = [
   { name: 'Tracking', href: '/admin/tracking', icon: ClipboardList },
   { name: 'Client Groups', href: '/admin/client-groups', icon: UsersRound },
   { name: 'Release Notes', href: '/admin/release-notes', icon: Megaphone },
+  { name: 'Invoices', href: '/admin/invoices', icon: FileText },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 

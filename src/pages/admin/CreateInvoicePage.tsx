@@ -9,7 +9,7 @@ import { createInvoice } from '@/lib/db/invoices'
 import InvoiceForm from '@/components/admin/InvoiceForm'
 import { createSubscription } from '@/lib/api/payments'
 import { toast } from 'sonner'
-import type { CreateInvoiceInput } from '@/lib/db/types/invoices'
+import type { CreateInvoiceInput, UpdateInvoiceInput } from '@/lib/db/types/invoices'
 
 export default function CreateInvoicePage() {
   const navigate = useNavigate()
@@ -27,16 +27,20 @@ export default function CreateInvoicePage() {
     },
   })
 
-  const handleSubmit = async (data: CreateInvoiceInput) => {
+  const handleSubmit = async (data: CreateInvoiceInput | UpdateInvoiceInput) => {
+    if (!('client_id' in data) || !('invoice_number' in data) || !('line_items' in data)) {
+      throw new Error('Invalid invoice data')
+    }
+    const invoiceData = data as CreateInvoiceInput
     // Create the invoice first
-    const invoice = await createInvoiceMutation.mutateAsync(data)
+    const invoice = await createInvoiceMutation.mutateAsync(invoiceData)
 
     // If it's a recurring invoice, create the subscription
-    if (data.is_recurring && data.recurring_interval) {
+    if (invoiceData.is_recurring && invoiceData.recurring_interval) {
       try {
         await createSubscription({
           invoice_id: invoice.id,
-          interval: data.recurring_interval,
+          interval: invoiceData.recurring_interval,
         })
         toast.success('Recurring subscription created successfully')
         queryClient.invalidateQueries({ queryKey: ['subscriptions'] })

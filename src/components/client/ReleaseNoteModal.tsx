@@ -4,7 +4,8 @@
  */
 
 import { useEffect } from 'react'
-import { X, Calendar, Megaphone } from 'lucide-react'
+import { Calendar, Megaphone } from 'lucide-react'
+import React from 'react'
 import { cn } from '@/lib/utils'
 import {
   Dialog,
@@ -31,9 +32,9 @@ function formatDate(dateStr: string | null): string {
 }
 
 // Simple markdown-like renderer for basic formatting
-function renderContent(content: string): JSX.Element {
+function renderContent(content: string): React.ReactElement {
   const lines = content.split('\n')
-  const elements: JSX.Element[] = []
+  const elements: React.ReactElement[] = []
 
   lines.forEach((line, index) => {
     if (line.startsWith('### ')) {

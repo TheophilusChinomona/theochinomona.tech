@@ -15,6 +15,7 @@ import {
   Settings,
   Home,
   CreditCard,
+  ClipboardList,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
@@ -32,6 +33,7 @@ import NotificationBell from '@/components/client/NotificationBell'
 const clientNavLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'My Projects', href: '/dashboard/projects', icon: FolderKanban },
+  { name: 'My Requests', href: '/dashboard/requests', icon: ClipboardList },
   { name: 'Portfolio', href: '/dashboard/portfolio', icon: Briefcase },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },

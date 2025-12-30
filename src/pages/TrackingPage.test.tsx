@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import TrackingPage from './TrackingPage'
 import * as trackingDb from '@/lib/db/tracking'
@@ -14,25 +14,6 @@ import * as trackingDb from '@/lib/db/tracking'
 vi.mock('@/lib/db/tracking', () => ({
   getProjectByTrackingCode: vi.fn(),
 }))
-
-// Create a wrapper for tests
-function createWrapper() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
-
-  return function Wrapper({ children }: { children: React.ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    )
-  }
-}
 
 function renderWithRouter(code: string) {
   const queryClient = new QueryClient({
@@ -69,11 +50,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: 'Test Client',
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -97,6 +80,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'completed',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [
@@ -108,6 +92,7 @@ describe('TrackingPage', () => {
                 sort_order: 0,
                 completion_percentage: 100,
                 developer_notes: 'Completed on time',
+                estimated_cost: null,
                 created_at: '2025-12-30T00:00:00Z',
                 updated_at: '2025-12-30T00:00:00Z',
               },
@@ -137,11 +122,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -165,6 +152,7 @@ describe('TrackingPage', () => {
             actual_end_date: '2025-01-14',
             status: 'completed',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [],
@@ -181,6 +169,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'in_progress',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [],
@@ -197,6 +186,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'pending',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [],
@@ -228,11 +218,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -256,6 +248,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'in_progress',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [
@@ -267,6 +260,7 @@ describe('TrackingPage', () => {
                 sort_order: 0,
                 completion_percentage: 100, // Complete
                 developer_notes: null,
+                estimated_cost: null,
                 created_at: '2025-12-30T00:00:00Z',
                 updated_at: '2025-12-30T00:00:00Z',
               },
@@ -278,6 +272,7 @@ describe('TrackingPage', () => {
                 sort_order: 1,
                 completion_percentage: 50, // Half complete
                 developer_notes: null,
+                estimated_cost: null,
                 created_at: '2025-12-30T00:00:00Z',
                 updated_at: '2025-12-30T00:00:00Z',
               },
@@ -310,11 +305,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -338,6 +335,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'in_progress',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [
@@ -349,6 +347,7 @@ describe('TrackingPage', () => {
                 sort_order: 0,
                 completion_percentage: 100,
                 developer_notes: null,
+                estimated_cost: null,
                 created_at: '2025-12-30T00:00:00Z',
                 updated_at: '2025-12-30T00:00:00Z',
               },
@@ -360,6 +359,7 @@ describe('TrackingPage', () => {
                 sort_order: 1,
                 completion_percentage: 50,
                 developer_notes: null,
+                estimated_cost: null,
                 created_at: '2025-12-30T00:00:00Z',
                 updated_at: '2025-12-30T00:00:00Z',
               },
@@ -431,11 +431,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -472,11 +474,13 @@ describe('TrackingPage', () => {
         category: 'Web',
         thumbnail: null,
         client_name: null,
+        client_id: null,
         project_url: null,
         github_url: null,
         completion_date: null,
         featured: false,
         status: 'published',
+        notifications_enabled: true,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
         tracking_code: {
@@ -500,6 +504,7 @@ describe('TrackingPage', () => {
             actual_end_date: null,
             status: 'pending',
             notify_on_complete: true,
+            estimated_cost: null,
             created_at: '2025-12-30T00:00:00Z',
             updated_at: '2025-12-30T00:00:00Z',
             tasks: [],

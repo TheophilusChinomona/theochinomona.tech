@@ -61,7 +61,7 @@ describe('Payment Schema', () => {
         insert: mockInsert,
       } as any)
 
-      const result = await supabase.from('payments').insert({
+      await supabase.from('payments').insert({
         invoice_id: '123e4567-e89b-12d3-a456-426614174000',
         amount: 10000,
         currency: 'usd',
@@ -150,7 +150,7 @@ describe('Payment Schema', () => {
         insert: mockInsert,
       } as any)
 
-      const result = await supabase.from('refunds').insert({
+      await supabase.from('refunds').insert({
         payment_id: '123e4567-e89b-12d3-a456-426614174000',
         invoice_id: '223e4567-e89b-12d3-a456-426614174001',
         amount: 5000,

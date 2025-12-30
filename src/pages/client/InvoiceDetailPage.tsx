@@ -4,9 +4,9 @@
  * Task Group 9: Client Billing Dashboard
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Download, Mail, FileText } from 'lucide-react'
+import { ArrowLeft, Download, Mail } from 'lucide-react'
 import { getInvoiceWithLineItems } from '@/lib/db/invoices'
 import { getPaymentsForInvoice } from '@/lib/db/payments'
 import { Button } from '@/components/ui/button'
@@ -39,7 +39,6 @@ export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   // Check for payment success/cancel messages
   const paymentStatus = searchParams.get('payment')

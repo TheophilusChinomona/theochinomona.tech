@@ -43,6 +43,7 @@ describe('Tasks Database Helpers', () => {
           sort_order: 0,
           completion_percentage: 100,
           developer_notes: 'Done',
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -54,6 +55,7 @@ describe('Tasks Database Helpers', () => {
           sort_order: 1,
           completion_percentage: 50,
           developer_notes: 'In progress',
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -72,8 +74,8 @@ describe('Tasks Database Helpers', () => {
       const result = await getTasksByPhaseId('phase-1')
 
       expect(result).toHaveLength(2)
-      expect(result[0].sort_order).toBe(0)
-      expect(result[1].sort_order).toBe(1)
+      expect(result[0]?.sort_order).toBe(0)
+      expect(result[1]?.sort_order).toBe(1)
     })
   })
 
@@ -87,6 +89,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 0,
         completion_percentage: 50,
         developer_notes: 'In progress',
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
       }
@@ -136,6 +139,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 2,
         completion_percentage: 0,
         developer_notes: null,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
       }
@@ -237,6 +241,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 0,
         completion_percentage: 75,
         developer_notes: 'Almost done',
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -343,6 +348,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 0,
         completion_percentage: 75,
         developer_notes: null,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -385,6 +391,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 0,
         completion_percentage: 75,
         developer_notes: null,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -421,6 +428,7 @@ describe('Tasks Database Helpers', () => {
         sort_order: 0,
         completion_percentage: 100,
         developer_notes: null,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -454,6 +462,7 @@ describe('Tasks Database Helpers', () => {
           sort_order: 0,
           completion_percentage: 100,
           developer_notes: null,
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -465,6 +474,7 @@ describe('Tasks Database Helpers', () => {
           sort_order: 0,
           completion_percentage: 50,
           developer_notes: null,
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },

@@ -3,7 +3,6 @@
  * Dialog for inviting new users and assigning them a role
  */
 
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -30,8 +29,8 @@ const inviteUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   name: z.string().min(1, 'Name is required'),
   surname: z.string().min(1, 'Surname is required'),
-  role: z.enum(['admin', 'client'], {
-    required_error: 'Role is required',
+  role: z.enum(['admin', 'client']).refine((val) => val !== undefined, {
+    message: 'Role is required',
   }),
 })
 

@@ -5,7 +5,6 @@
 
 import { useState } from 'react'
 import { Paperclip, Image, FileText, Video, Download, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 interface Attachment {
   id: string

@@ -5,7 +5,15 @@
 
 import { supabase } from '@/lib/supabase'
 
-export type ProjectStatus = 'draft' | 'published'
+export type ProjectStatus =
+  | 'draft'
+  | 'published'
+  | 'pending_approval'
+  | 'awaiting_payment'
+  | 'approved'
+  | 'denied'
+
+export type PaymentPreference = 'upfront_deposit' | 'milestone_based'
 
 export interface Project {
   id: string
@@ -22,6 +30,11 @@ export interface Project {
   featured: boolean
   status: ProjectStatus
   notifications_enabled: boolean
+  created_by: string | null
+  payment_preference: PaymentPreference | null
+  requires_payment: boolean | null
+  deposit_paid: boolean
+  invoice_id: string | null
   created_at: string
   updated_at: string
 }
@@ -40,6 +53,11 @@ export interface CreateProjectInput {
   featured?: boolean
   status?: ProjectStatus
   notifications_enabled?: boolean
+  created_by?: string | null
+  payment_preference?: PaymentPreference | null
+  requires_payment?: boolean | null
+  deposit_paid?: boolean
+  invoice_id?: string | null
 }
 
 export interface UpdateProjectInput {
@@ -56,6 +74,11 @@ export interface UpdateProjectInput {
   featured?: boolean
   status?: ProjectStatus
   notifications_enabled?: boolean
+  created_by?: string | null
+  payment_preference?: PaymentPreference | null
+  requires_payment?: boolean | null
+  deposit_paid?: boolean
+  invoice_id?: string | null
 }
 
 /**
@@ -115,7 +138,9 @@ export async function getProjectById(id: string): Promise<Project | null> {
 }
 
 /**
- * Create a new project (admin only)
+ * Create a new project (admin or client)
+ * If created_by is provided (client), status defaults to 'pending_approval'
+ * If created_by is null (admin), status defaults to 'draft'
  */
 export async function createProject(data: CreateProjectInput): Promise<Project> {
   // Validate required fields
@@ -129,6 +154,13 @@ export async function createProject(data: CreateProjectInput): Promise<Project> 
 
   if (!data.category) {
     throw new Error('Category is required')
+  }
+
+  // Determine default status based on who created it
+  let defaultStatus: ProjectStatus = 'draft'
+  if (data.created_by) {
+    // Client-created projects start as pending_approval
+    defaultStatus = 'pending_approval'
   }
 
   const { data: project, error } = await supabase
@@ -145,8 +177,13 @@ export async function createProject(data: CreateProjectInput): Promise<Project> 
       github_url: data.github_url || null,
       completion_date: data.completion_date || null,
       featured: data.featured ?? false,
-      status: data.status || 'draft',
+      status: data.status || defaultStatus,
       notifications_enabled: data.notifications_enabled ?? true,
+      created_by: data.created_by || null,
+      payment_preference: data.payment_preference || null,
+      requires_payment: data.requires_payment ?? null,
+      deposit_paid: data.deposit_paid ?? false,
+      invoice_id: data.invoice_id || null,
     })
     .select()
     .single()
@@ -219,5 +256,68 @@ export async function bulkDeleteProjects(ids: string[]): Promise<void> {
   if (error) {
     throw error
   }
+}
+
+/**
+ * Update project status
+ */
+export async function updateProjectStatus(
+  projectId: string,
+  status: ProjectStatus,
+  metadata?: Record<string, unknown>
+): Promise<Project> {
+  const updates: UpdateProjectInput = {
+    status,
+    ...metadata,
+  }
+
+  return updateProject(projectId, updates)
+}
+
+/**
+ * Mark deposit as paid and update project status to approved
+ */
+export async function markDepositPaid(
+  projectId: string,
+  invoiceId: string
+): Promise<Project> {
+  const { data, error } = await supabase
+    .from('projects')
+    .update({
+      status: 'approved',
+      deposit_paid: true,
+      invoice_id: invoiceId,
+    })
+    .eq('id', projectId)
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('Project not found')
+    }
+    throw error
+  }
+
+  return data as Project
+}
+
+/**
+ * Get projects filtered by status
+ */
+export async function getProjectsByStatus(
+  status: ProjectStatus
+): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*, client:users!projects_client_id_fkey(id, name, surname, email)')
+    .eq('status', status)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw error
+  }
+
+  return (data || []) as Project[]
 }
 

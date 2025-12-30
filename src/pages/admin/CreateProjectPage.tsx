@@ -5,7 +5,7 @@
 
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createProject, type CreateProjectInput } from '@/lib/db/projects'
+import { createProject, type CreateProjectInput, type UpdateProjectInput } from '@/lib/db/projects'
 import { toast } from 'sonner'
 import ProjectForm from '@/components/admin/ProjectForm'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -28,8 +28,12 @@ export default function CreateProjectPage() {
     },
   })
 
-  const handleSubmit = async (data: CreateProjectInput) => {
-    await createProjectMutation.mutateAsync(data)
+  const handleSubmit = async (data: CreateProjectInput | UpdateProjectInput) => {
+    if (!('title' in data) || !data.title) {
+      throw new Error('Title is required')
+    }
+    const projectData = data as CreateProjectInput
+    await createProjectMutation.mutateAsync(projectData)
   }
 
   return (

@@ -13,6 +13,8 @@ import {
   Trophy,
   Edit,
   Activity,
+  CreditCard,
+  Receipt,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ActivityLogEntry, ActivityLogEventType } from '@/lib/db/types/dashboard'
@@ -61,6 +63,26 @@ const eventTypeConfig: Record<
     color: 'text-yellow-400',
     label: 'Project completed',
   },
+  invoice_created: {
+    icon: FileText,
+    color: 'text-zinc-400',
+    label: 'Invoice created',
+  },
+  invoice_sent: {
+    icon: FileText,
+    color: 'text-blue-400',
+    label: 'Invoice sent',
+  },
+  payment_received: {
+    icon: CreditCard,
+    color: 'text-emerald-400',
+    label: 'Payment received',
+  },
+  refund_processed: {
+    icon: Receipt,
+    color: 'text-zinc-400',
+    label: 'Refund processed',
+  },
 }
 
 function getTimeAgo(dateStr: string): string {
@@ -96,6 +118,18 @@ function getEventDescription(event: ActivityLogEntry): string {
       return 'Project was created'
     case 'project_completed':
       return 'Project was marked as complete'
+    case 'invoice_created':
+      return data.invoice_number ? `Invoice ${data.invoice_number} was created` : 'An invoice was created'
+    case 'invoice_sent':
+      return data.invoice_number ? `Invoice ${data.invoice_number} was sent` : 'An invoice was sent'
+    case 'payment_received':
+      return data.invoice_number 
+        ? `Payment received for Invoice ${data.invoice_number}` 
+        : 'Payment received'
+    case 'refund_processed':
+      return data.invoice_number
+        ? `Refund processed for Invoice ${data.invoice_number}`
+        : 'Refund processed'
     default:
       return 'Activity recorded'
   }

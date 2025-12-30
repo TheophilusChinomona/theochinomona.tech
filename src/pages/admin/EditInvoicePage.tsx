@@ -95,18 +95,6 @@ export default function EditInvoicePage() {
     )
   }
 
-  // Convert invoice data to form format
-  const formData = {
-    ...invoice,
-    line_items: invoice.line_items.map((item) => ({
-      ...item,
-      quantity: item.quantity,
-      unit_price: item.unit_price / 100, // Convert from cents
-      total: item.total / 100, // Convert from cents
-    })),
-    discount_amount: invoice.discount_amount / 100, // Convert from cents
-  }
-
   return (
     <div className="space-y-6">
       <div>

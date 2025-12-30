@@ -5,7 +5,6 @@
  */
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { CreditCard, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,10 +33,8 @@ export function PayInvoiceButton({ invoice, variant = 'default', size = 'default
   const [isLoading, setIsLoading] = useState(false)
   const [paymentAmount, setPaymentAmount] = useState<string>('')
   const [isPartialPayment, setIsPartialPayment] = useState(false)
-  const navigate = useNavigate()
 
   const invoiceTotal = invoice.total / 100 // Convert cents to dollars
-  const remainingAmount = invoiceTotal
 
   const handlePayNow = async () => {
     setIsLoading(true)

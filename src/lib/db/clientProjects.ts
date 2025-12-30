@@ -196,6 +196,10 @@ export async function getNextMilestone(
   }
 
   const nextPhase = phases[0]
+  if (!nextPhase) {
+    return null
+  }
+
   const project = projects.find((p) => p.id === nextPhase.project_id)
 
   if (!project) {

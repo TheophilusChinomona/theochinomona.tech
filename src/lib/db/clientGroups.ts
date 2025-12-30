@@ -227,7 +227,7 @@ export async function getGroupMembers(groupId: string): Promise<User[]> {
 
   // Extract user objects from the join
   return (data ?? [])
-    .map((m) => (m as { user_id: string; users: User }).users)
+    .map((m) => (m as unknown as { user_id: string; users: User }).users)
     .filter(Boolean) as User[]
 }
 
@@ -249,7 +249,7 @@ export async function getUserGroups(userId: string): Promise<ClientGroup[]> {
 
   // Extract group objects from the join
   return (data ?? [])
-    .map((m) => (m as { group_id: string; client_groups: ClientGroup }).client_groups)
+    .map((m) => (m as unknown as { group_id: string; client_groups: ClientGroup }).client_groups)
     .filter(Boolean) as ClientGroup[]
 }
 

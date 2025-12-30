@@ -45,7 +45,7 @@ import {
 import { toast } from 'sonner'
 import PhaseCard from '@/components/admin/PhaseCard'
 import AddPhaseDialog from '@/components/admin/AddPhaseDialog'
-import type { ProjectPhase, ProjectTask } from '@/lib/db/tracking'
+import type { ProjectTask } from '@/lib/db/tracking'
 
 export default function ProjectTrackingPage() {
   const { projectId } = useParams<{ projectId: string }>()
@@ -102,7 +102,10 @@ export default function ProjectTrackingPage() {
       if (!acc[task.phase_id]) {
         acc[task.phase_id] = []
       }
-      acc[task.phase_id].push(task)
+      const phaseTasks = acc[task.phase_id]
+      if (phaseTasks) {
+        phaseTasks.push(task)
+      }
       return acc
     },
     {} as Record<string, ProjectTask[]>

@@ -3,6 +3,9 @@
  * Task Group 4: Database Functions & Types
  */
 
+import { createNotification } from './notifications'
+import { logActivity } from './activityLog'
+import { getInvoiceById } from './invoices'
 import { supabase } from '@/lib/supabase'
 import type {
   Payment,
@@ -14,21 +17,21 @@ import type {
 /**
  * Create a new payment record
  */
-export async function createPayment(data: CreatePaymentInput): Promise<Payment> {
-  if (!data.invoice_id || !data.amount || !data.currency) {
+export async function createPayment(input: CreatePaymentInput): Promise<Payment> {
+  if (!input.invoice_id || !input.amount || !input.currency) {
     throw new Error('Invoice ID, amount, and currency are required')
   }
 
-  const { data: payment, error } = await supabase
+  const { data, error } = await supabase
     .from('payments')
     .insert({
-      invoice_id: data.invoice_id,
-      amount: data.amount,
-      currency: data.currency,
-      status: data.status || 'pending',
-      stripe_payment_intent_id: data.stripe_payment_intent_id || null,
-      stripe_charge_id: data.stripe_charge_id || null,
-      paid_at: data.paid_at || null,
+      invoice_id: input.invoice_id,
+      amount: input.amount,
+      currency: input.currency,
+      status: input.status || 'pending',
+      stripe_payment_intent_id: input.stripe_payment_intent_id || null,
+      stripe_charge_id: input.stripe_charge_id || null,
+      paid_at: input.paid_at || null,
     })
     .select()
     .single()
@@ -37,7 +40,47 @@ export async function createPayment(data: CreatePaymentInput): Promise<Payment> 
     throw new Error(`Failed to create payment: ${error.message}`)
   }
 
-  return payment as Payment
+  const payment = data as Payment
+
+  // Handle side effects if payment is created as succeeded
+  if (payment.status === 'succeeded') {
+    try {
+      const invoice = await getInvoiceById(payment.invoice_id)
+      
+      if (invoice) {
+        // Notification
+        await createNotification(
+          invoice.client_id,
+          'payment_received',
+          'Payment Received',
+          `Payment of ${(payment.amount / 100).toFixed(2)} ${payment.currency.toUpperCase()} received for Invoice ${invoice.invoice_number}`,
+          {
+            payment_id: payment.id,
+            invoice_id: invoice.id,
+            project_id: invoice.project_id,
+          }
+        )
+
+        // Activity Log
+        if (invoice.project_id) {
+          await logActivity(
+            invoice.project_id,
+            'payment_received',
+            {
+              payment_id: payment.id,
+              amount: payment.amount,
+              currency: payment.currency,
+              invoice_number: invoice.invoice_number,
+            }
+          )
+        }
+      }
+    } catch (e) {
+      console.error('Failed to handle payment creation side effects:', e)
+    }
+  }
+
+  return payment
 }
 
 /**
@@ -90,20 +133,65 @@ export async function updatePaymentStatus(
     ...additionalFields,
   }
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('payments')
     .update(updateData)
     .eq('id', id)
     .select()
     .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      throw new Error('Payment not found')
+  const payment = data as Payment
+
+  try {
+    const invoice = await getInvoiceById(payment.invoice_id)
+    
+    if (invoice) {
+      if (status === 'succeeded') {
+        // Notification
+        await createNotification(
+          invoice.client_id,
+          'payment_received',
+          'Payment Received',
+          `Payment of ${(payment.amount / 100).toFixed(2)} ${payment.currency.toUpperCase()} received for Invoice ${invoice.invoice_number}`,
+          {
+            payment_id: payment.id,
+            invoice_id: invoice.id,
+            project_id: invoice.project_id,
+          }
+        )
+
+        // Activity Log
+        if (invoice.project_id) {
+          await logActivity(
+            invoice.project_id,
+            'payment_received',
+            {
+              payment_id: payment.id,
+              amount: payment.amount,
+              currency: payment.currency,
+              invoice_number: invoice.invoice_number,
+            }
+          )
+        }
+      } else if (status === 'failed') {
+        // Notification only for failure
+        await createNotification(
+          invoice.client_id,
+          'payment_failed',
+          'Payment Failed',
+          `Payment for Invoice ${invoice.invoice_number} failed. Please try again.`,
+          {
+            payment_id: payment.id,
+            invoice_id: invoice.id,
+            project_id: invoice.project_id,
+          }
+        )
+      }
     }
-    throw new Error(`Failed to update payment: ${error.message}`)
+  } catch (e) {
+    console.error('Failed to handle payment update side effects:', e)
   }
 
-  return data as Payment
+  return payment
 }
 

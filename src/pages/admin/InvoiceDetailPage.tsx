@@ -10,7 +10,6 @@ import { Mail, Download, ArrowLeft, RefreshCw } from 'lucide-react'
 import {
   getInvoiceWithLineItems,
   updateInvoiceStatus,
-  type InvoiceWithLineItems,
 } from '@/lib/db/invoices'
 import { getPaymentsForInvoice } from '@/lib/db/payments'
 import { getRefundsForInvoice } from '@/lib/db/refunds'

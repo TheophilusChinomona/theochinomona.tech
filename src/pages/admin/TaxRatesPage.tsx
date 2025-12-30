@@ -5,7 +5,6 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
 import { Plus, Edit, Trash2, Loader2 } from 'lucide-react'
 import {
   getAllTaxRates,
@@ -55,7 +54,6 @@ type TaxRateFormData = z.infer<typeof taxRateSchema>
 export default function TaxRatesPage() {
   const [editingTaxRate, setEditingTaxRate] = useState<TaxRate | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const {
@@ -68,7 +66,7 @@ export default function TaxRatesPage() {
   })
 
   const form = useForm<TaxRateFormData>({
-    resolver: zodResolver(taxRateSchema),
+    resolver: zodResolver(taxRateSchema) as any,
     defaultValues: {
       name: '',
       rate: 0,

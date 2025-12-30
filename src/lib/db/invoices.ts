@@ -3,6 +3,8 @@
  * Task Group 4: Database Functions & Types
  */
 
+import { createNotification } from './notifications'
+import { logActivity } from './activityLog'
 import { supabase } from '@/lib/supabase'
 import type {
   Invoice,
@@ -12,6 +14,9 @@ import type {
   UpdateInvoiceInput,
   InvoiceStatus,
 } from './types/invoices'
+
+// Re-export types for external use
+export type { CreateInvoiceInput, InvoiceWithLineItems } from './types/invoices'
 
 /**
  * Create a new invoice with line items
@@ -75,6 +80,23 @@ export async function createInvoice(data: CreateInvoiceInput): Promise<InvoiceWi
     // Rollback: delete the invoice if line items fail
     await supabase.from('invoices').delete().eq('id', invoice.id)
     throw new Error(`Failed to create line items: ${lineItemsError.message}`)
+  }
+
+  // Log activity
+  if (invoice.project_id) {
+    try {
+      await logActivity(
+        invoice.project_id,
+        'invoice_created',
+        {
+          invoice_id: invoice.id,
+          invoice_number: invoice.invoice_number,
+          total: invoice.total,
+        }
+      )
+    } catch (e) {
+      console.error('Failed to log invoice creation activity:', e)
+    }
   }
 
   return {
@@ -193,7 +215,56 @@ export async function updateInvoiceStatus(
     ...additionalFields,
   }
 
-  return updateInvoice(id, updateData)
+  const { data, error } = await supabase
+    .from('invoices')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      throw new Error('Invoice not found')
+    }
+    throw new Error(`Failed to update invoice: ${error.message}`)
+  }
+
+  const invoice = data as Invoice
+
+  // Handle notifications and activity logging for 'sent' status
+  if (status === 'sent') {
+    try {
+      // Send notification to client
+      await createNotification(
+        invoice.client_id,
+        'invoice_sent',
+        'Invoice Sent',
+        `Invoice ${invoice.invoice_number} has been sent. Total: ${(invoice.total / 100).toFixed(2)} ${invoice.currency.toUpperCase()}`,
+        {
+          invoice_id: invoice.id,
+          project_id: invoice.project_id,
+          invoice_number: invoice.invoice_number,
+        }
+      )
+
+      // Log activity if project_id exists
+      if (invoice.project_id) {
+        await logActivity(
+          invoice.project_id,
+          'invoice_sent',
+          {
+            invoice_id: invoice.id,
+            invoice_number: invoice.invoice_number,
+            status: 'sent',
+          }
+        )
+      }
+    } catch (e) {
+      console.error('Failed to handle invoice sent side effects:', e)
+    }
+  }
+
+  return invoice
 }
 
 /**

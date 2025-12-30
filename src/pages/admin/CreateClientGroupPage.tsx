@@ -16,7 +16,7 @@ export default function CreateClientGroupPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: ClientGroupFormData) =>
-      createClientGroup(data.name, data.description),
+      createClientGroup(data.name, data.description ?? undefined),
     onSuccess: (group) => {
       toast.success('Client group created successfully')
       queryClient.invalidateQueries({ queryKey: ['client-groups'] })

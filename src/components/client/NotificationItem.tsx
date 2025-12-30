@@ -12,6 +12,8 @@ import {
   Paperclip,
   Megaphone,
   AlertCircle,
+  CreditCard,
+  Receipt,
   LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -34,6 +36,11 @@ const notificationTypeConfig: Record<
   file_uploaded: { icon: Paperclip, color: 'text-violet-400' },
   release_note: { icon: Megaphone, color: 'text-pink-400' },
   system: { icon: AlertCircle, color: 'text-zinc-400' },
+  invoice_sent: { icon: FileText, color: 'text-blue-400' },
+  payment_received: { icon: CreditCard, color: 'text-emerald-400' },
+  payment_failed: { icon: AlertCircle, color: 'text-red-400' },
+  invoice_overdue: { icon: AlertCircle, color: 'text-orange-400' },
+  refund_processed: { icon: Receipt, color: 'text-zinc-400' },
 }
 
 function getTimeAgo(dateStr: string): string {
@@ -68,7 +75,10 @@ export default function NotificationItem({
 
     // Navigate based on notification data
     const data = notification.data
-    if (data?.project_id) {
+    if (data?.invoice_id) {
+      // Navigate to invoice detail
+      navigate(`/dashboard/billing/${data.invoice_id}`)
+    } else if (data?.project_id) {
       navigate(`/dashboard/projects/${data.project_id}`)
     } else if (data?.release_note_id) {
       // Release notes are handled differently (open modal)

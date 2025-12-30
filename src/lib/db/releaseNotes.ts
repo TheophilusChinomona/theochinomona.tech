@@ -9,7 +9,6 @@ import type {
   ReleaseNoteWithReadStatus,
   ReleaseNoteInput,
   ReleaseNoteTarget,
-  ReleaseNoteTargetType,
 } from './types/dashboard'
 
 // ============================================================================

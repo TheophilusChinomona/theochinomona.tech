@@ -27,7 +27,10 @@ import type { ProjectTask } from '@/lib/db/tracking'
 const editTaskSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
-  completion_percentage: z.coerce.number().min(0).max(100),
+  completion_percentage: z.preprocess(
+    (val) => (val === '' || val === undefined ? 0 : Number(val)),
+    z.number().min(0).max(100)
+  ),
   developer_notes: z.string().optional(),
 })
 
@@ -42,7 +45,7 @@ interface EditTaskDialogProps {
 
 export default function EditTaskDialog({
   task,
-  projectId,
+  projectId: _projectId,
   open,
   onOpenChange,
 }: EditTaskDialogProps) {
@@ -54,7 +57,7 @@ export default function EditTaskDialog({
     formState: { errors },
     reset,
   } = useForm<EditTaskFormData>({
-    resolver: zodResolver(editTaskSchema),
+    resolver: zodResolver(editTaskSchema) as any,
     defaultValues: {
       name: task.name,
       description: task.description || '',
@@ -103,7 +106,7 @@ export default function EditTaskDialog({
           <DialogTitle className="text-zinc-100">Edit Task</DialogTitle>
           <DialogDescription className="text-zinc-400">Update task details.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-zinc-300">
               Task Name *

@@ -12,7 +12,6 @@ import {
   Clock,
   Copy,
   ExternalLink,
-  CreditCard,
   MessageSquare,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'

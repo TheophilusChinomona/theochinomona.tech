@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 import ProjectList from './ProjectList'
-import { getAllProjects, deleteProject, bulkDeleteProjects } from '@/lib/db/projects'
+import { getAllProjects, deleteProject, bulkDeleteProjects, type Project } from '@/lib/db/projects'
 
 // Mock the database functions
 vi.mock('@/lib/db/projects', () => ({
@@ -51,7 +51,7 @@ describe('ProjectList', () => {
   const mockDeleteProject = vi.mocked(deleteProject)
   const mockBulkDeleteProjects = vi.mocked(bulkDeleteProjects)
 
-  const mockProjects = [
+  const mockProjects: Project[] = [
     {
       id: '1',
       title: 'Project 1',
@@ -60,11 +60,13 @@ describe('ProjectList', () => {
       category: 'Web',
       thumbnail: null,
       client_name: null,
+      client_id: null,
       project_url: null,
       github_url: null,
       completion_date: null,
       featured: false,
-      status: 'draft' as const,
+      status: 'draft',
+      notifications_enabled: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },
@@ -76,11 +78,13 @@ describe('ProjectList', () => {
       category: 'Mobile',
       thumbnail: 'https://example.com/image.jpg',
       client_name: 'Client Name',
+      client_id: null,
       project_url: 'https://example.com',
       github_url: 'https://github.com/example',
       completion_date: '2025-12-01',
       featured: true,
-      status: 'published' as const,
+      status: 'published',
+      notifications_enabled: true,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     },

@@ -12,6 +12,10 @@ import {
   Trophy,
   Edit,
   Activity,
+  Receipt,
+  Send,
+  CreditCard,
+  RotateCcw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ActivityLogEntry, ActivityLogEventType } from '@/lib/db/types/dashboard'
@@ -59,6 +63,26 @@ const eventTypeConfig: Record<
     icon: Trophy,
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-500/10',
+  },
+  invoice_created: {
+    icon: Receipt,
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+  },
+  invoice_sent: {
+    icon: Send,
+    color: 'text-indigo-400',
+    bgColor: 'bg-indigo-500/10',
+  },
+  payment_received: {
+    icon: CreditCard,
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
+  },
+  refund_processed: {
+    icon: RotateCcw,
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10',
   },
 }
 
@@ -180,7 +204,10 @@ export default function ProjectActivityTimeline({
                     <span>•</span>
                     <span>{time}</span>
                   </div>
-                  {activity.event_data?.description && (
+                  {activity.event_data && 
+                    typeof activity.event_data === 'object' &&
+                    'description' in activity.event_data &&
+                    typeof activity.event_data.description === 'string' && (
                     <p className="mt-2 text-sm text-zinc-400">
                       {activity.event_data.description}
                     </p>

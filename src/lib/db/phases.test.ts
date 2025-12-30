@@ -46,6 +46,7 @@ describe('Phases Database Helpers', () => {
           actual_end_date: null,
           status: 'completed',
           notify_on_complete: true,
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -61,6 +62,7 @@ describe('Phases Database Helpers', () => {
           actual_end_date: null,
           status: 'in_progress',
           notify_on_complete: true,
+          estimated_cost: null,
           created_at: '2025-12-30T00:00:00Z',
           updated_at: '2025-12-30T00:00:00Z',
         },
@@ -79,8 +81,8 @@ describe('Phases Database Helpers', () => {
       const result = await getPhasesByProjectId('proj-123')
 
       expect(result).toHaveLength(2)
-      expect(result[0].sort_order).toBe(0)
-      expect(result[1].sort_order).toBe(1)
+      expect(result[0]?.sort_order).toBe(0)
+      expect(result[1]?.sort_order).toBe(1)
       expect(mockOrder).toHaveBeenCalledWith('sort_order', { ascending: true })
     })
 
@@ -115,6 +117,7 @@ describe('Phases Database Helpers', () => {
         actual_end_date: null,
         status: 'pending',
         notify_on_complete: true,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
       }
@@ -168,6 +171,7 @@ describe('Phases Database Helpers', () => {
         actual_end_date: null,
         status: 'pending',
         notify_on_complete: true,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T00:00:00Z',
       }
@@ -253,6 +257,7 @@ describe('Phases Database Helpers', () => {
         actual_end_date: null,
         status: 'in_progress',
         notify_on_complete: false,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -377,6 +382,7 @@ describe('Phases Database Helpers', () => {
         actual_end_date: '2025-01-14',
         status: 'completed',
         notify_on_complete: true,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }
@@ -418,6 +424,7 @@ describe('Phases Database Helpers', () => {
         actual_end_date: null,
         status: 'in_progress',
         notify_on_complete: true,
+        estimated_cost: null,
         created_at: '2025-12-30T00:00:00Z',
         updated_at: '2025-12-30T12:00:00Z',
       }

@@ -158,9 +158,9 @@ export default function PhaseCard({
                 <h3 className="text-lg font-semibold text-zinc-100 truncate">{phase.name}</h3>
                 <Badge className={statusColors[phase.status]}>{statusLabels[phase.status]}</Badge>
                 {phase.notify_on_complete ? (
-                  <Bell className="h-4 w-4 text-zinc-500" title="Notifications enabled" />
+                  <Bell className="h-4 w-4 text-zinc-500" aria-label="Notifications enabled" />
                 ) : (
-                  <BellOff className="h-4 w-4 text-zinc-600" title="Notifications disabled" />
+                  <BellOff className="h-4 w-4 text-zinc-600" aria-label="Notifications disabled" />
                 )}
               </div>
 

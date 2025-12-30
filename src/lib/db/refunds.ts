@@ -3,6 +3,9 @@
  * Task Group 4: Database Functions & Types
  */
 
+import { createNotification } from './notifications'
+import { logActivity } from './activityLog'
+import { getInvoiceById } from './invoices'
 import { supabase } from '@/lib/supabase'
 import type {
   Refund,
@@ -14,20 +17,20 @@ import type {
 /**
  * Create a new refund record
  */
-export async function createRefund(data: CreateRefundInput): Promise<Refund> {
-  if (!data.payment_id || !data.invoice_id || !data.amount) {
+export async function createRefund(input: CreateRefundInput): Promise<Refund> {
+  if (!input.payment_id || !input.invoice_id || !input.amount) {
     throw new Error('Payment ID, invoice ID, and amount are required')
   }
 
-  const { data: refund, error } = await supabase
+  const { data, error } = await supabase
     .from('refunds')
     .insert({
-      payment_id: data.payment_id,
-      invoice_id: data.invoice_id,
-      amount: data.amount,
-      reason: data.reason || null,
-      stripe_refund_id: data.stripe_refund_id || null,
-      status: data.status || 'pending',
+      payment_id: input.payment_id,
+      invoice_id: input.invoice_id,
+      amount: input.amount,
+      reason: input.reason || null,
+      stripe_refund_id: input.stripe_refund_id || null,
+      status: input.status || 'pending',
     })
     .select()
     .single()
@@ -36,7 +39,46 @@ export async function createRefund(data: CreateRefundInput): Promise<Refund> {
     throw new Error(`Failed to create refund: ${error.message}`)
   }
 
-  return refund as Refund
+  const refund = data as Refund
+
+  // Handle side effects if refund is created as succeeded
+  if (refund.status === 'succeeded') {
+    try {
+      const invoice = await getInvoiceById(refund.invoice_id)
+      
+      if (invoice) {
+        // Notification
+        await createNotification(
+          invoice.client_id,
+          'refund_processed',
+          'Refund Processed',
+          `Refund of ${(refund.amount / 100).toFixed(2)} USD processed for Invoice ${invoice.invoice_number}`,
+          {
+            refund_id: refund.id,
+            invoice_id: invoice.id,
+            project_id: invoice.project_id,
+          }
+        )
+
+        // Activity Log
+        if (invoice.project_id) {
+          await logActivity(
+            invoice.project_id,
+            'refund_processed',
+            {
+              refund_id: refund.id,
+              amount: refund.amount,
+              invoice_number: invoice.invoice_number,
+            }
+          )
+        }
+      }
+    } catch (e) {
+      console.error('Failed to handle refund creation side effects:', e)
+    }
+  }
+
+  return refund
 }
 
 /**
@@ -89,20 +131,51 @@ export async function updateRefundStatus(
     ...additionalFields,
   }
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('refunds')
     .update(updateData)
     .eq('id', id)
     .select()
     .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      throw new Error('Refund not found')
+  const refund = data as Refund
+
+  if (status === 'succeeded') {
+    try {
+      const invoice = await getInvoiceById(refund.invoice_id)
+      
+      if (invoice) {
+        // Notification
+        await createNotification(
+          invoice.client_id,
+          'refund_processed',
+          'Refund Processed',
+          `Refund of ${(refund.amount / 100).toFixed(2)} USD processed for Invoice ${invoice.invoice_number}`,
+          {
+            refund_id: refund.id,
+            invoice_id: invoice.id,
+            project_id: invoice.project_id,
+          }
+        )
+
+        // Activity Log
+        if (invoice.project_id) {
+          await logActivity(
+            invoice.project_id,
+            'refund_processed',
+            {
+              refund_id: refund.id,
+              amount: refund.amount,
+              invoice_number: invoice.invoice_number,
+            }
+          )
+        }
+      }
+    } catch (e) {
+      console.error('Failed to handle refund update side effects:', e)
     }
-    throw new Error(`Failed to update refund: ${error.message}`)
   }
 
-  return data as Refund
+  return refund
 }
 

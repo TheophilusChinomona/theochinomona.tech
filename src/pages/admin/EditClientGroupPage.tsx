@@ -3,7 +3,7 @@
  * Page for editing an existing client group and managing members
  */
 
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { getClientGroupById, updateClientGroup } from '@/lib/db/clientGroups'
@@ -13,7 +13,6 @@ import { toast } from 'sonner'
 
 export default function EditClientGroupPage() {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   // Fetch client group
@@ -26,7 +25,7 @@ export default function EditClientGroupPage() {
   const updateMutation = useMutation({
     mutationFn: (data: ClientGroupFormData) =>
       id
-        ? updateClientGroup(id, { name: data.name, description: data.description })
+        ? updateClientGroup(id, { name: data.name, description: data.description ?? undefined })
         : Promise.reject('No ID'),
     onSuccess: () => {
       toast.success('Client group updated successfully')

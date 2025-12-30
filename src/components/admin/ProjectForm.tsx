@@ -8,7 +8,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Plus, Upload, Loader2, User } from 'lucide-react'
+import { X, Plus, Loader2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,8 +30,8 @@ const projectFormSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200, 'Title must be at most 200 characters'),
   description: z.string().min(10, 'Description must be at least 10 characters').max(2000, 'Description must be at most 2000 characters'),
   tech: z.array(z.string().min(2, 'Each tech item must be at least 2 characters')).min(1, 'At least one technology is required'),
-  category: z.enum(['Web', 'Mobile', 'Full-Stack', 'Design'], {
-    required_error: 'Category is required',
+  category: z.enum(['Web', 'Mobile', 'Full-Stack', 'Design']).refine((val) => val !== undefined, {
+    message: 'Category is required',
   }),
   thumbnail: z.string().optional().refine((val) => !val || z.string().url().safeParse(val).success, {
     message: 'Must be a valid URL',
@@ -80,6 +80,7 @@ export default function ProjectForm({
   })
 
   const form = useForm<ProjectFormData>({
+    // @ts-expect-error - zodResolver type inference issue with defaults
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
       title: project?.title || '',
@@ -100,6 +101,7 @@ export default function ProjectForm({
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
+    // @ts-expect-error - Type inference issue with zodResolver and useFieldArray
     name: 'tech',
   })
 
@@ -200,10 +202,10 @@ export default function ProjectForm({
     }
   }
 
-  const { register, handleSubmit: handleFormSubmit, formState: { errors, isSubmitting: formIsSubmitting }, watch, setValue, clearErrors } = form
+  const { register, handleSubmit: handleFormSubmit, formState: { errors, isSubmitting: formIsSubmitting }, watch, setValue } = form
 
   return (
-    <form onSubmit={handleFormSubmit(handleSubmit)} className="space-y-6">
+    <form onSubmit={handleFormSubmit(handleSubmit as any)} className="space-y-6">
       {/* Title */}
       <div className="space-y-2">
         <Label htmlFor="title" className="text-zinc-300">

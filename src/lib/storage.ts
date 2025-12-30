@@ -133,7 +133,7 @@ export async function deleteProjectThumbnail(fileUrl: string): Promise<void> {
  */
 export async function checkStorageAvailability(): Promise<boolean> {
   try {
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from(BUCKET_NAME)
       .list('', {
         limit: 1,
@@ -143,6 +143,146 @@ export async function checkStorageAvailability(): Promise<boolean> {
     return !error
   } catch {
     return false
+  }
+}
+
+// ============================================================================
+// Project Request Attachments Storage Functions
+// ============================================================================
+
+const REQUEST_ATTACHMENTS_BUCKET = 'project-request-attachments'
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
+/**
+ * Validates that a file is a PDF or image and within size limits
+ */
+export function validateRequestAttachmentFile(file: File): void {
+  const validTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+  ]
+
+  if (!validTypes.includes(file.type)) {
+    throw new Error(
+      `Invalid file type. Allowed types: PDF, JPG, PNG, GIF, WebP`
+    )
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(
+      `File size exceeds maximum of ${MAX_FILE_SIZE / 1024 / 1024}MB`
+    )
+  }
+}
+
+/**
+ * Determines file type from file object
+ */
+export function getAttachmentFileType(file: File): 'pdf' | 'image' {
+  if (file.type === 'application/pdf') {
+    return 'pdf'
+  }
+  return 'image'
+}
+
+/**
+ * Generates a unique filename for request attachment
+ */
+function generateRequestAttachmentFileName(
+  requestId: string,
+  originalName: string
+): string {
+  const timestamp = Date.now()
+  const extension = originalName.split('.').pop() || 'pdf'
+  // Sanitize filename: remove special chars, keep only alphanumeric, dots, and hyphens
+  const baseName = originalName
+    .replace(/\.[^/.]+$/, '') // Remove extension
+    .replace(/[^a-zA-Z0-9.-]/g, '_')
+    .substring(0, 50)
+  return `request-${requestId}-${timestamp}-${baseName}.${extension}`
+}
+
+/**
+ * Upload a project request attachment to Supabase Storage
+ * 
+ * @param file - The file to upload (PDF or image)
+ * @param requestId - The ID of the project request
+ * @returns The public URL of the uploaded file
+ * @throws Error if upload fails or file validation fails
+ */
+export async function uploadProjectRequestAttachment(
+  file: File,
+  requestId: string
+): Promise<string> {
+  // Validate file
+  validateRequestAttachmentFile(file)
+
+  // Generate unique filename
+  const fileName = generateRequestAttachmentFileName(requestId, file.name)
+  const filePath = `attachments/${fileName}`
+
+  // Upload file to Supabase Storage
+  const { data, error } = await supabase.storage
+    .from(REQUEST_ATTACHMENTS_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false, // Don't overwrite existing files
+    })
+
+  if (error) {
+    throw new Error(`Failed to upload file: ${error.message}`)
+  }
+
+  if (!data) {
+    throw new Error('Upload succeeded but no data returned')
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from(REQUEST_ATTACHMENTS_BUCKET)
+    .getPublicUrl(filePath)
+
+  if (!urlData?.publicUrl) {
+    throw new Error('Failed to get public URL for uploaded file')
+  }
+
+  return urlData.publicUrl
+}
+
+/**
+ * Delete a project request attachment from Supabase Storage
+ * 
+ * @param fileUrl - The public URL of the file to delete
+ * @returns void
+ * @throws Error if deletion fails
+ */
+export async function deleteProjectRequestAttachment(
+  fileUrl: string
+): Promise<void> {
+  // Extract file path from URL
+  // URL format: https://[project].supabase.co/storage/v1/object/public/project-request-attachments/attachments/filename.pdf
+  const urlParts = fileUrl.split('/')
+  const fileNameIndex = urlParts.findIndex(
+    (part) => part === REQUEST_ATTACHMENTS_BUCKET
+  )
+
+  if (fileNameIndex === -1 || fileNameIndex === urlParts.length - 1) {
+    throw new Error('Invalid file URL format')
+  }
+
+  // Reconstruct path (everything after bucket name)
+  const filePath = urlParts.slice(fileNameIndex + 1).join('/')
+
+  const { error } = await supabase.storage
+    .from(REQUEST_ATTACHMENTS_BUCKET)
+    .remove([filePath])
+
+  if (error) {
+    throw new Error(`Failed to delete file: ${error.message}`)
   }
 }
 

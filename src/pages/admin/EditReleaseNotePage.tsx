@@ -49,8 +49,7 @@ export default function EditReleaseNotePage() {
         title: data.title,
         content: data.content,
         target_type: data.target_type,
-        is_published: data.is_published,
-      })
+      } as any)
 
       // Update targets
       await setReleaseNoteTargets(id, data.targets)

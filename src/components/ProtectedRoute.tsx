@@ -19,8 +19,8 @@ export default function ProtectedRoute({
   const { user, isLoading, isAuthenticated } = useAuth()
   const location = useLocation()
 
-  // Debug logging in development
-  if (import.meta.env.DEV) {
+  // Debug logging in development (only log when there's an issue)
+  if (import.meta.env.DEV && !isLoading && (!isAuthenticated || !user || (requiredRole && user.role !== requiredRole))) {
     console.log('ProtectedRoute Debug:', {
       isLoading,
       isAuthenticated,
