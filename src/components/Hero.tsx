@@ -64,9 +64,9 @@ export default function Hero({
           }}
         />
         {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 z-0 bg-zinc-950/70" />
+        <div className="absolute inset-0 z-[1] bg-zinc-950/60" />
         
-        <FluidBackground />
+        <FluidBackground className="z-[2] opacity-40" />
         
         <MouseParallaxContainer
           className="absolute inset-0 w-full h-full"

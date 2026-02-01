@@ -1,10 +1,15 @@
 import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
-export default function FluidBackground() {
+interface FluidBackgroundProps {
+  className?: string
+}
+
+export default function FluidBackground({ className }: FluidBackgroundProps) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950" />
+    <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>
+      {/* Background gradient - removed for hero with image */}
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950" /> */}
       
       {/* Animated gradient blobs */}
       <motion.div
