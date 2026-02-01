@@ -4,12 +4,14 @@
  * Task Group 7: Admin Invoice Management
  */
 
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Mail, Download, ArrowLeft, RefreshCw } from 'lucide-react'
+import { Mail, Download, ArrowLeft, RefreshCw, Trash2 } from 'lucide-react'
 import {
   getInvoiceWithLineItems,
   updateInvoiceStatus,
+  deleteInvoice,
 } from '@/lib/db/invoices'
 import { getPaymentsForInvoice } from '@/lib/db/payments'
 import { getRefundsForInvoice } from '@/lib/db/refunds'
@@ -28,6 +30,16 @@ import {
 import { toast } from 'sonner'
 import { formatDistanceToNow } from 'date-fns'
 import { supabase } from '@/lib/supabase'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 const statusColors: Record<string, string> = {
   draft: 'bg-zinc-700 text-zinc-300',
@@ -43,6 +55,7 @@ export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const {
     data: invoice,
@@ -97,6 +110,19 @@ export default function InvoiceDetailPage() {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to send invoice')
+    },
+  })
+
+  const deleteInvoiceMutation = useMutation({
+    mutationFn: (invoiceId: string) => deleteInvoice(invoiceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['invoice', id] })
+      toast.success('Invoice deleted successfully')
+      navigate('/admin/invoices')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to delete invoice')
     },
   })
 
@@ -193,6 +219,14 @@ export default function InvoiceDetailPage() {
           <Button variant="outline" onClick={handleDownloadPDF}>
             <Download className="h-4 w-4 mr-2" />
             Download PDF
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setDeleteDialogOpen(true)}
+            className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
           </Button>
         </div>
       </div>
@@ -425,6 +459,31 @@ export default function InvoiceDetailPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Invoice Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-400">Delete Invoice</AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400">
+              Are you sure you want to delete invoice {invoice.invoice_number}? This action
+              cannot be undone. All associated line items will also be deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => id && deleteInvoiceMutation.mutate(id)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={deleteInvoiceMutation.isPending}
+            >
+              {deleteInvoiceMutation.isPending ? 'Deleting...' : 'Delete Invoice'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -28,19 +28,98 @@ export interface NextMilestone {
 
 /**
  * Get all projects assigned to a specific client
+ * Includes projects where client_id OR created_by matches the clientId
+ * Excludes soft-deleted projects
  */
 export async function getProjectsByClientId(clientId: string): Promise<Project[]> {
-  const { data, error } = await supabase
+  console.log('[getProjectsByClientId] Fetching projects for clientId:', clientId)
+  
+  // Fetch projects where client_id matches
+  let { data: clientProjects, error: clientError } = await supabase
     .from('projects')
     .select('*')
     .eq('client_id', clientId)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false })
+  
+  console.log('[getProjectsByClientId] client_id query result:', {
+    count: clientProjects?.length || 0,
+    error: clientError?.message,
+    code: clientError?.code,
+  })
 
-  if (error) {
-    throw new Error(`Failed to fetch client projects: ${error.message}`)
+  // If error is about deleted_at column not existing, retry without the filter
+  if (clientError && (clientError.code === '42703' || clientError.message?.includes('deleted_at'))) {
+    const retry = await supabase
+      .from('projects')
+      .select('*')
+      .eq('client_id', clientId)
+      .order('created_at', { ascending: false })
+    
+    if (retry.error) {
+      throw new Error(`Failed to fetch client projects: ${retry.error.message}`)
+    }
+    clientProjects = retry.data
+    clientError = null
+  } else if (clientError) {
+    throw new Error(`Failed to fetch client projects: ${clientError.message}`)
   }
 
-  return data as Project[]
+  // Fetch projects where created_by matches
+  let { data: createdProjects, error: createdError } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('created_by', clientId)
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false })
+  
+  console.log('[getProjectsByClientId] created_by query result:', {
+    count: createdProjects?.length || 0,
+    error: createdError?.message,
+    code: createdError?.code,
+  })
+
+  // If error is about deleted_at column not existing, retry without the filter
+  if (createdError && (createdError.code === '42703' || createdError.message?.includes('deleted_at'))) {
+    const retry = await supabase
+      .from('projects')
+      .select('*')
+      .eq('created_by', clientId)
+      .order('created_at', { ascending: false })
+    
+    if (retry.error) {
+      throw new Error(`Failed to fetch created projects: ${retry.error.message}`)
+    }
+    createdProjects = retry.data
+    createdError = null
+  } else if (createdError) {
+    throw new Error(`Failed to fetch created projects: ${createdError.message}`)
+  }
+
+  // Combine and deduplicate by project ID
+  const allProjects = [...(clientProjects || []), ...(createdProjects || [])]
+  
+  // Filter out soft-deleted projects in JavaScript (in case deleted_at column exists but wasn't filtered)
+  const filteredProjects = allProjects.filter(
+    (p: Project) => !('deleted_at' in p) || !p.deleted_at || p.deleted_at === null
+  )
+  
+  const uniqueProjects = Array.from(
+    new Map(filteredProjects.map((project) => [project.id, project])).values()
+  )
+
+  // Sort by created_at descending
+  uniqueProjects.sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+
+  console.log('[getProjectsByClientId] Final result:', {
+    total: uniqueProjects.length,
+    projectIds: uniqueProjects.map(p => p.id),
+  })
+
+  return uniqueProjects as Project[]
 }
 
 /**

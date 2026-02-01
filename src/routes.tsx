@@ -26,10 +26,10 @@ import ClientProjectDetailPage from './pages/client/ClientProjectDetailPage'
 import ClientPortfolioPage from './pages/client/ClientPortfolioPage'
 import ClientSettingsPage from './pages/client/ClientSettingsPage'
 import NotificationsPage from './pages/client/NotificationsPage'
+import AdminNotificationsPage from './pages/admin/NotificationsPage'
 import BillingPage from './pages/client/BillingPage'
 import ClientInvoiceDetailPage from './pages/client/InvoiceDetailPage'
 import ClientCreateProjectPage from './pages/client/CreateProjectPage'
-import MyRequestsPage from './pages/client/MyRequestsPage'
 import ReleaseNotesPage from './pages/admin/ReleaseNotesPage'
 import CreateReleaseNotePage from './pages/admin/CreateReleaseNotePage'
 import EditReleaseNotePage from './pages/admin/EditReleaseNotePage'
@@ -92,6 +92,7 @@ export default function AppRoutes() {
         <Route path="invoices/:id" element={<AdminInvoiceDetailPage />} />
         <Route path="invoices/:id/edit" element={<EditInvoicePage />} />
         <Route path="invoices/:id/refund" element={<ProcessRefundPage />} />
+        <Route path="notifications" element={<AdminNotificationsPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="settings/tax-rates" element={<TaxRatesPage />} />
       </Route>
@@ -109,7 +110,6 @@ export default function AppRoutes() {
         <Route path="projects" element={<MyProjectsPage />} />
         <Route path="projects/new" element={<ClientCreateProjectPage />} />
         <Route path="projects/:id" element={<ClientProjectDetailPage />} />
-        <Route path="requests" element={<MyRequestsPage />} />
         <Route path="portfolio" element={<ClientPortfolioPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="billing/:id" element={<ClientInvoiceDetailPage />} />

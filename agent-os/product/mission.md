@@ -74,6 +74,9 @@ People don't know:
 - Live client project tracking
 - Admin + Client dashboards
 - Theme + Feature toggle system
+- Production-grade error handling and resilience
+- Optimistic UI updates for instant feedback
+- Comprehensive integration testing
 
 ---
 
@@ -98,4 +101,11 @@ People don't know:
 - Project management
 - Theme + feature toggles
 - Blog management
+
+### Quality & Reliability
+
+- Error boundaries for graceful failure handling
+- Optimistic updates for instant user feedback
+- Comprehensive integration testing
+- Performance optimization with React 19 features
 

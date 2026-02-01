@@ -82,6 +82,32 @@ Admin controls theme + toggles blog/features + apply globally.
 
 ---
 
+### 11. [ ] Senior Developer Quality Improvements
+
+**Error Handling & Resilience:**
+- React Error Boundaries at layout level (MainLayout, AdminLayout, ClientLayout)
+- Graceful degradation for component failures
+- Comprehensive error logging and user-friendly error messages
+
+**Performance Optimization:**
+- Implement React 19 `useOptimistic` for Project Comments (instant UI updates)
+- Optimistic updates for other critical user interactions
+- Code splitting and lazy loading for route components
+- Image optimization and lazy loading
+
+**Testing Depth:**
+- Integration tests for critical paths:
+  - Invoice Payment flow (end-to-end)
+  - Project Creation from Template (full workflow)
+  - Project Comment threading and notifications
+  - Authentication and authorization flows
+- Error boundary testing
+- Performance testing for optimistic updates
+
+**Size:** `L`
+
+---
+
 ## Phase Groupings
 
 | Phase      | Steps | Focus                    |
@@ -90,6 +116,7 @@ Admin controls theme + toggles blog/features + apply globally.
 | Core       | 3–5   | Differentiator features  |
 | Client     | 6–8   | Client experience        |
 | Polish     | 9–10  | Power user features      |
+| Quality    | 11    | Senior-level improvements|
 
 ---
 

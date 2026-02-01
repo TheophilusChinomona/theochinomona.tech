@@ -48,7 +48,9 @@ const projectFormSchema = z.object({
   completion_date: z.string().optional(),
   featured: z.boolean().default(false),
   notifications_enabled: z.boolean().default(true),
-  status: z.enum(['draft', 'published']).default('draft'),
+  status: z
+    .enum(['pending', 'pending_payment', 'pending_info', 'in_progress', 'in_testing', 'completed'])
+    .default('pending'),
 })
 
 type ProjectFormData = z.infer<typeof projectFormSchema>
@@ -95,7 +97,7 @@ export default function ProjectForm({
       completion_date: project?.completion_date || '',
       featured: project?.featured || false,
       notifications_enabled: project?.notifications_enabled ?? true,
-      status: project?.status || 'draft',
+      status: (project?.status as ProjectFormData['status']) || 'pending',
     },
   })
 
@@ -513,15 +515,30 @@ export default function ProjectForm({
           Status
         </Label>
         <Select
-          onValueChange={(value) => setValue('status', value as 'draft' | 'published')}
+          onValueChange={(value) =>
+            setValue(
+              'status',
+              value as
+                | 'pending'
+                | 'pending_payment'
+                | 'pending_info'
+                | 'in_progress'
+                | 'in_testing'
+                | 'completed'
+            )
+          }
           defaultValue={watch('status')}
         >
           <SelectTrigger id="status" className="bg-zinc-950 border-zinc-800 text-zinc-100">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="pending_payment">Pending Payment</SelectItem>
+            <SelectItem value="pending_info">Pending Info</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="in_testing">In Testing</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
           </SelectContent>
         </Select>
         {errors.status && (

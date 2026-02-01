@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import NotificationBell from '@/components/client/NotificationBell'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,6 +100,9 @@ export default function AdminLayout() {
                 )
               })}
 
+              {/* Notification Bell */}
+              <NotificationBell />
+
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -178,6 +182,11 @@ export default function AdminLayout() {
                     </Link>
                   )
                 })}
+
+                {/* Mobile Notification Bell */}
+                <div className="px-4 py-2">
+                  <NotificationBell />
+                </div>
 
                 {/* Mobile User Section */}
                 <div className="pt-2 mt-2 border-t border-zinc-800">

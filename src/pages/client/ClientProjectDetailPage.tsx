@@ -19,15 +19,16 @@ import { getClientProjectWithPhases } from '@/lib/db/clientProjects'
 import { getActivityLogForProject } from '@/lib/db/activityLog'
 import { getTrackingCodeByProjectId } from '@/lib/db/tracking'
 import { getInvoicesForClient } from '@/lib/db/invoices'
+import { getTasksByPhaseIds } from '@/lib/db/tasks'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import PrivateNotesSection from '@/components/client/PrivateNotesSection'
 import OrganizedAttachments from '@/components/client/OrganizedAttachments'
 import ProjectActivityTimeline from '@/components/client/ProjectActivityTimeline'
 import { PayInvoiceButton } from '@/components/client/PayInvoiceButton'
+import ProjectCommentThread from '@/components/project/ProjectCommentThread'
 import { useNavigate } from 'react-router-dom'
 
 export default function ClientProjectDetailPage() {
@@ -70,6 +71,26 @@ export default function ClientProjectDetailPage() {
     enabled: !!user?.id,
     select: (invoices) => invoices.filter((inv) => inv.project_id === id),
   })
+
+  // Fetch tasks for all phases
+  const phaseIds = project?.project_phases?.map((p) => p.id) || []
+  const { data: allTasks = [] } = useQuery({
+    queryKey: ['tasks', 'client', id, phaseIds],
+    queryFn: () => (phaseIds.length > 0 ? getTasksByPhaseIds(phaseIds) : []),
+    enabled: !!id && phaseIds.length > 0,
+  })
+
+  // Group tasks by phase
+  const tasksByPhase = allTasks.reduce(
+    (acc, task) => {
+      if (!acc[task.phase_id]) {
+        acc[task.phase_id] = []
+      }
+      acc[task.phase_id].push(task)
+      return acc
+    },
+    {} as Record<string, typeof allTasks>
+  )
 
   // Calculate progress
   const phases = project?.project_phases || []
@@ -206,86 +227,149 @@ export default function ClientProjectDetailPage() {
           {/* Phases List */}
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
             <h3 className="text-sm font-medium text-zinc-400 mb-4">Project Phases</h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {phases.map((phase, index) => {
+                const phaseTasks = tasksByPhase[phase.id] || []
+                const phaseTaskProgress =
+                  phaseTasks.length > 0
+                    ? Math.round(
+                        phaseTasks.reduce((sum, t) => sum + t.completion_percentage, 0) /
+                          phaseTasks.length
+                      )
+                    : 0
                 const phaseProgress =
                   phase.status === 'completed'
                     ? 100
                     : phase.status === 'in_progress'
-                    ? 50
+                    ? phaseTaskProgress
                     : 0
 
                 return (
                   <div
                     key={phase.id}
-                    className="flex items-center gap-4 p-3 rounded-lg border border-zinc-800 hover:border-zinc-700 transition-colors"
+                    className="p-4 rounded-lg border border-zinc-800 hover:border-zinc-700 transition-colors"
                   >
-                    <div
-                      className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
-                        phase.status === 'completed'
-                          ? 'bg-emerald-500/10 text-emerald-400'
-                          : phase.status === 'in_progress'
-                          ? 'bg-amber-500/10 text-amber-400'
-                          : 'bg-zinc-800 text-zinc-500'
-                      )}
-                    >
-                      {phase.status === 'completed' ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : (
-                        index + 1
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-200">{phase.name}</p>
-                      {phase.description && (
-                        <p className="text-xs text-zinc-500 truncate">{phase.description}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      {phase.estimated_end_date && (
-                        <div className="flex items-center gap-1 text-xs text-zinc-500">
-                          <Calendar className="w-3 h-3" />
-                          {new Date(phase.estimated_end_date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
+                    <div className="flex items-center gap-4 mb-3">
+                      <div
+                        className={cn(
+                          'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
+                          phase.status === 'completed'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : phase.status === 'in_progress'
+                            ? 'bg-amber-500/10 text-amber-400'
+                            : 'bg-zinc-800 text-zinc-500'
+                        )}
+                      >
+                        {phase.status === 'completed' ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-zinc-200">{phase.name}</p>
+                        {phase.description && (
+                          <p className="text-xs text-zinc-500 mt-1">{phase.description}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4">
+                        {phase.estimated_end_date && (
+                          <div className="flex items-center gap-1 text-xs text-zinc-500">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(phase.estimated_end_date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </div>
+                        )}
+                        <div className="w-24 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            className={cn(
+                              'h-full rounded-full transition-all',
+                              phase.status === 'completed'
+                                ? 'bg-emerald-500'
+                                : phase.status === 'in_progress'
+                                ? 'bg-amber-500'
+                                : 'bg-zinc-700'
+                            )}
+                            style={{ width: `${phaseProgress}%` }}
+                          />
                         </div>
-                      )}
-                      <div className="w-24 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                        <div
-                          className={cn(
-                            'h-full rounded-full transition-all',
-                            phase.status === 'completed'
-                              ? 'bg-emerald-500'
-                              : phase.status === 'in_progress'
-                              ? 'bg-amber-500'
-                              : 'bg-zinc-700'
-                          )}
-                          style={{ width: `${phaseProgress}%` }}
-                        />
                       </div>
                     </div>
+
+                    {/* Tasks within this phase */}
+                    {phaseTasks.length > 0 && (
+                      <div className="ml-12 mt-3 space-y-2 border-t border-zinc-800 pt-3">
+                        <p className="text-xs text-zinc-500 mb-2">
+                          {phaseTasks.length} task{phaseTasks.length !== 1 ? 's' : ''}
+                        </p>
+                        {phaseTasks.map((task) => (
+                          <div
+                            key={task.id}
+                            className="flex items-start gap-3 p-2 rounded bg-zinc-800/30 border border-zinc-800/50"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm text-zinc-200">{task.name}</p>
+                                {task.developer_notes && (
+                                  <MessageSquare className="h-3 w-3 text-zinc-500 flex-shrink-0" />
+                                )}
+                              </div>
+                              {task.description && (
+                                <p className="text-xs text-zinc-500 mt-1">{task.description}</p>
+                              )}
+                              {task.developer_notes && (
+                                <div className="mt-2 p-2 rounded bg-indigo-500/10 border border-indigo-500/20">
+                                  <p className="text-xs font-medium text-indigo-400 mb-1">
+                                    Developer Notes:
+                                  </p>
+                                  <p className="text-xs text-indigo-300/80 whitespace-pre-wrap">
+                                    {task.developer_notes}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-indigo-500 rounded-full transition-all"
+                                  style={{ width: `${task.completion_percentage}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-zinc-400 w-10 text-right">
+                                {task.completion_percentage}%
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )
               })}
             </div>
           </div>
 
-          {/* Two Column Layout for Details */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Private Notes */}
-            <PrivateNotesSection notes={[]} isLoading={false} />
-
-            {/* Attachments */}
-            <OrganizedAttachments attachments={[]} isLoading={false} />
-          </div>
+          {/* Attachments */}
+          <OrganizedAttachments attachments={[]} isLoading={false} />
 
           {/* Activity Timeline */}
           <ProjectActivityTimeline
             activities={activities || []}
             isLoading={activitiesLoading}
           />
+
+          {/* Comment Thread */}
+          <Card>
+            <CardContent className="p-6">
+              <ProjectCommentThread
+                projectId={project.id}
+                projectStatus={project.status}
+                canReply={user?.role === 'client' && project.status === 'pending_info'}
+              />
+            </CardContent>
+          </Card>
 
           {/* Billing Section */}
           {projectInvoices.length > 0 && (

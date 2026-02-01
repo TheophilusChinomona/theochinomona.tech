@@ -6,8 +6,22 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Search, MoreVertical, Edit, Trash2, Eye, Plus, ClipboardList } from 'lucide-react'
-import { getAllProjects, deleteProject, bulkDeleteProjects, type Project } from '@/lib/db/projects'
+import { Search, MoreVertical, Edit, Trash2, Eye, Plus, ClipboardList, Filter } from 'lucide-react'
+import {
+  getAllProjects,
+  deleteProject,
+  bulkDeleteProjects,
+  updateProjectStatus,
+  type Project,
+  type ProjectStatus,
+} from '@/lib/db/projects'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -34,8 +48,11 @@ import DeleteProjectDialog from '@/components/admin/DeleteProjectDialog'
 import BulkDeleteProjectsDialog from '@/components/admin/BulkDeleteProjectsDialog'
 import ViewProjectDialog from '@/components/admin/ViewProjectDialog'
 
+type StatusFilterGroup = 'all' | 'pending' | 'active' | 'completed'
+
 export default function ProjectList() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilterGroup>('all')
   const [selectedProjects, setSelectedProjects] = useState<Set<string>>(new Set())
   const [viewingProject, setViewingProject] = useState<Project | null>(null)
   const [deletingProject, setDeletingProject] = useState<Project | null>(null)
@@ -80,6 +97,19 @@ export default function ProjectList() {
     },
   })
 
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ projectId, status }: { projectId: string; status: ProjectStatus }) =>
+      updateProjectStatus(projectId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })
+      toast.success('Project status updated successfully')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to update project status')
+    },
+  })
+
   const handleDelete = (project: Project) => {
     deleteProjectMutation.mutate(project.id)
   }
@@ -108,12 +138,33 @@ export default function ProjectList() {
     setSelectedProjects(newSelected)
   }
 
-  // Filter projects based on search query
-  const filteredProjects = projects?.filter(
-    (project) =>
+  // Filter projects based on search query and status
+  const filteredProjects = projects?.filter((project) => {
+    // Search filter
+    const matchesSearch =
       project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       project.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+
+    // Status filter
+    let matchesStatus = true
+    if (statusFilter !== 'all') {
+      switch (statusFilter) {
+        case 'pending':
+          matchesStatus = ['pending', 'pending_payment', 'pending_info'].includes(project.status)
+          break
+        case 'active':
+          matchesStatus = ['in_progress', 'in_testing'].includes(project.status)
+          break
+        case 'completed':
+          matchesStatus = project.status === 'completed'
+          break
+        default:
+          matchesStatus = true
+      }
+    }
+
+    return matchesSearch && matchesStatus
+  })
 
   const allSelected = projects && projects.length > 0 && selectedProjects.size === projects.length
 
@@ -147,21 +198,38 @@ export default function ProjectList() {
         </Button>
       </div>
 
-      {/* Search */}
+      {/* Search and Filters */}
       <Card>
         <CardHeader>
           <CardTitle>Search Projects</CardTitle>
-          <CardDescription>Search by title or description</CardDescription>
+          <CardDescription>Search by title or description and filter by status</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
-            <Input
-              placeholder="Search by title or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
+              <Input
+                placeholder="Search by title or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => setStatusFilter(v as StatusFilterGroup)}
+            >
+              <SelectTrigger className="w-[140px]">
+                <Filter className="w-4 h-4 mr-2 text-zinc-500" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -248,15 +316,28 @@ export default function ProjectList() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        {project.status === 'published' ? (
-                          <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-medium">
-                            Published
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 text-xs font-medium">
-                            Draft
-                          </span>
-                        )}
+                        <Select
+                          value={project.status}
+                          onValueChange={(value) =>
+                            updateStatusMutation.mutate({
+                              projectId: project.id,
+                              status: value as ProjectStatus,
+                            })
+                          }
+                          disabled={updateStatusMutation.isPending}
+                        >
+                          <SelectTrigger className="w-[140px] h-7 text-xs bg-zinc-900 border-zinc-800">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-zinc-900 border-zinc-800">
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="pending_payment">Pending Payment</SelectItem>
+                            <SelectItem value="pending_info">Pending Info</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="in_testing">In Testing</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </TableCell>
                       <TableCell>
                         {project.featured ? (

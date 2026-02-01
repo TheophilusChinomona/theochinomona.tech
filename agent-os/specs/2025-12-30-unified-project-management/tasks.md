@@ -11,31 +11,31 @@ Total Tasks: 15 Task Groups
 **Dependencies:** None
 
 - [x] 1.0 Complete project status enum replacement
-  - [ ] 1.1 Write 5-6 focused tests for status enum replacement
+  - [x] 1.1 Write 5-6 focused tests for status enum replacement
     - Test: New enum type project_status_new exists with all required values
     - Test: Old status values are correctly mapped to new values
     - Test: All existing projects have valid status after migration
     - Test: RLS policies work with new status values
     - Test: Status enum comment is updated correctly
-  - [ ] 1.2 Create new project_status_new enum type
+  - [x] 1.2 Create new project_status_new enum type
     - Create migration file: `supabase/migrations/YYYYMMDDHHMMSS_create_new_project_status_enum.sql`
     - Create enum: `CREATE TYPE project_status_new AS ENUM ('pending', 'pending_payment', 'pending_info', 'in_progress', 'in_testing', 'completed')`
     - Add comment: `'Unified project status: pending, pending_payment, pending_info, in_progress, in_testing, completed'`
-  - [ ] 1.3 Add temporary status_new column to projects table
+  - [x] 1.3 Add temporary status_new column to projects table
     - Create migration file: `supabase/migrations/YYYYMMDDHHMMSS_add_temp_status_column.sql`
     - Add column: `status_new project_status_new`
-  - [ ] 1.4 Map old statuses to new statuses
+  - [x] 1.4 Map old statuses to new statuses
     - Update all rows: map `pending_approval` → `pending`, `awaiting_payment` → `pending_payment`, `approved` → `in_progress`, `published` → `completed` (if applicable), `draft` → `pending`, `denied` → `completed` (or handle separately)
     - Handle any edge cases or unmapped statuses
-  - [ ] 1.5 Replace old status column with new
+  - [x] 1.5 Replace old status column with new
     - Drop old `status` column
     - Rename `status_new` to `status`
     - Drop old `project_status` enum type
-  - [ ] 1.6 Update all RLS policies and queries
+  - [x] 1.6 Update all RLS policies and queries
     - Review all existing RLS policies that reference status
     - Update policies to use new status values
     - Update any database functions or triggers that reference status
-  - [ ] 1.7 Ensure status enum replacement tests pass
+  - [x] 1.7 Ensure status enum replacement tests pass
     - Run ONLY the 5-6 tests written in 1.1
     - Verify all projects have valid status values
     - Verify RLS policies work correctly
@@ -53,33 +53,33 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 1
 
 - [x] 2.0 Complete projects table schema updates
-  - [ ] 2.1 Write 4-5 focused tests for projects table updates
+  - [x] 2.1 Write 4-5 focused tests for projects table updates
     - Test: projects table has is_hiring_request field (boolean, default false)
     - Test: projects table has deleted_at field (timestamptz, nullable)
     - Test: projects table has created_by field (UUID, FK to users, nullable)
     - Test: Indexes exist on deleted_at and is_hiring_request
     - Test: RLS policies allow clients to view projects where client_id OR created_by matches
-  - [ ] 2.2 Add is_hiring_request field to projects table
+  - [x] 2.2 Add is_hiring_request field to projects table
     - Create migration file: `supabase/migrations/YYYYMMDDHHMMSS_add_is_hiring_request_field.sql`
     - Add column: `is_hiring_request BOOLEAN NOT NULL DEFAULT false`
     - Add comment explaining the field purpose
-  - [ ] 2.3 Add deleted_at field to projects table
+  - [x] 2.3 Add deleted_at field to projects table
     - Create migration file: `supabase/migrations/YYYYMMDDHHMMSS_add_deleted_at_field.sql`
     - Add column: `deleted_at TIMESTAMPTZ NULLABLE`
     - Add comment explaining soft-delete functionality
-  - [ ] 2.4 Verify created_by field exists
+  - [x] 2.4 Verify created_by field exists
     - Check if `created_by` field already exists in projects table
     - If not, create migration to add it: `created_by UUID REFERENCES users(id) ON DELETE SET NULL`
-  - [ ] 2.5 Create indexes for new fields
+  - [x] 2.5 Create indexes for new fields
     - Create index on `projects.deleted_at` for filtering soft-deleted projects
     - Create index on `projects.is_hiring_request` for admin prioritization queries
     - Create index on `projects.created_by` if not exists
-  - [ ] 2.6 Update RLS policies for projects table
+  - [x] 2.6 Update RLS policies for projects table
     - Update SELECT policy: Clients can view projects where `client_id` OR `created_by` matches their user_id AND `deleted_at IS NULL`
     - Update UPDATE policy: Clients can update projects where `created_by` matches their user_id AND status is pending (pending, pending_payment, pending_info)
     - Add DELETE policy: Clients can soft-delete (UPDATE deleted_at) projects where `created_by` matches their user_id AND status IN ('pending', 'pending_payment', 'pending_info')
     - Ensure admins can manage all projects (hard-delete)
-  - [ ] 2.7 Ensure projects table update tests pass
+  - [x] 2.7 Ensure projects table update tests pass
     - Run ONLY the 4-5 tests written in 2.1
     - Verify migrations run successfully
     - Verify RLS policies work correctly
@@ -97,14 +97,14 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 2
 
 - [x] 3.0 Complete project comments database schema
-  - [ ] 3.1 Write 5-6 focused tests for project comments schema
+  - [x] 3.1 Write 5-6 focused tests for project comments schema
     - Test: project_comments table exists with all required columns
     - Test: project_comment_attachments table links correctly to comments
     - Test: RLS policies allow clients to SELECT/INSERT comments for their projects
     - Test: RLS policies allow admins to manage all comments
     - Test: Threaded replies work via parent_comment_id
     - Test: updated_at trigger works correctly
-  - [ ] 3.2 Create project_comments table migration
+  - [x] 3.2 Create project_comments table migration
     - Create migration file: `supabase/migrations/YYYYMMDDHHMMSS_create_project_comments_table.sql`
     - Table fields: `id` (UUID, primary key), `project_id` (UUID, FK to projects, ON DELETE CASCADE), `user_id` (UUID, FK to users), `parent_comment_id` (UUID, FK to project_comments, nullable), `content` (TEXT), `created_at` (TIMESTAMPTZ), `updated_at` (TIMESTAMPTZ)
     - Add FK constraints with appropriate ON DELETE behavior
@@ -145,7 +145,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 2
 
 - [x] 4.0 Complete project templates database schema
-  - [ ] 4.1 Write 4-5 focused tests for project templates schema
+  - [x] 4.1 Write 4-5 focused tests for project templates schema
     - Test: project_templates table exists with all required columns
     - Test: project_template_attachments table links correctly to templates
     - Test: RLS policies allow users to SELECT/INSERT/UPDATE/DELETE their own templates
@@ -186,7 +186,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 1, Task Group 3
 
 - [x] 5.0 Complete status change automation setup
-  - [ ] 5.1 Write 4-5 focused tests for status change automation
+  - [x] 5.1 Write 4-5 focused tests for status change automation
     - Test: Database trigger updates project status when invoice is created
     - Test: Database trigger updates project status when admin comment is created
     - Test: Database trigger updates project status when client replies to comment
@@ -230,7 +230,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 1, Task Group 2
 
 - [x] 6.0 Complete project requests data migration
-  - [ ] 6.1 Write 4-5 focused tests for data migration
+  - [x] 6.1 Write 4-5 focused tests for data migration
     - Test: All project_requests records are migrated to projects table
     - Test: Status values are correctly mapped (pending → pending, approved → in_progress, needs_info → pending_info)
     - Test: Attachments are migrated from project_request_attachments to project_attachments
@@ -277,7 +277,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 3
 
 - [x] 7.0 Complete project comments API
-  - [ ] 7.1 Write 4-5 focused tests for project comments API
+  - [x] 7.1 Write 4-5 focused tests for project comments API
     - Test: createComment() creates comment and handles status changes
     - Test: getCommentsForProject() returns all comments with attachments
     - Test: getCommentById() returns single comment with attachments
@@ -322,7 +322,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 1, Task Group 2
 
 - [x] 8.0 Complete project status management API
-  - [ ] 8.1 Write 5-6 focused tests for project status management API
+  - [x] 8.1 Write 5-6 focused tests for project status management API
     - Test: updateProjectStatus() updates status and logs activity
     - Test: softDeleteProject() validates user ownership and status
     - Test: hardDeleteProject() permanently deletes project and related data
@@ -374,7 +374,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 4
 
 - [x] 9.0 Complete project templates API
-  - [ ] 9.1 Write 4-5 focused tests for project templates API
+  - [x] 9.1 Write 4-5 focused tests for project templates API
     - Test: createTemplate() creates template from project data
     - Test: getTemplatesForUser() returns user's templates
     - Test: getTemplateById() validates ownership
@@ -426,7 +426,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 8
 
 - [x] 10.0 Complete project cloning API
-  - [ ] 10.1 Write 3-4 focused tests for project cloning API
+  - [x] 10.1 Write 3-4 focused tests for project cloning API
     - Test: cloneProject() validates user ownership
     - Test: cloneProject() creates new project with copied fields
     - Test: cloneProject() does NOT copy phases, tasks, comments, attachments
@@ -458,7 +458,7 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 8
 
 - [x] 11.0 Complete invoice integration updates
-  - [ ] 11.1 Write 3-4 focused tests for invoice integration
+  - [x] 11.1 Write 3-4 focused tests for invoice integration
     - Test: createInvoice() automatically updates project status to pending_payment
     - Test: createInvoice() logs activity when status changes
     - Test: createInvoice() sends notification to client
@@ -493,23 +493,23 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 8
 
 - [x] 12.0 Complete unified My Projects page
-  - [ ] 12.1 Write 4-5 focused tests for unified My Projects page
+  - [x] 12.1 Write 4-5 focused tests for unified My Projects page
     - Test: Page shows projects in separate "Active Projects" and "Pending Projects" sections
     - Test: Status filter dropdown works with grouped options
     - Test: Delete button only shows for client-created projects with pending statuses
     - Test: Clone button only shows for client-created projects
     - Test: Projects are filtered correctly by status group
-  - [ ] 12.2 Update MyProjectsPage.tsx structure
+  - [x] 12.2 Update MyProjectsPage.tsx structure
     - Update file: `src/pages/client/MyProjectsPage.tsx`
     - Add two sections: "Active Projects" and "Pending Projects"
     - Section 1: Projects with status `in_progress`, `in_testing`, `completed`
     - Section 2: Projects with status `pending`, `pending_payment`, `pending_info`
     - Display projects using existing `ClientProjectCard` component
-  - [ ] 12.3 Add "Create Project" button
+  - [x] 12.3 Add "Create Project" button
     - Add button at top of page
     - Link to `/dashboard/projects/new`
     - Style consistently with existing buttons
-  - [ ] 12.4 Implement grouped status filter dropdown
+  - [x] 12.4 Implement grouped status filter dropdown
     - Update filter dropdown to use grouped options:
       - "All" - shows all projects
       - "Pending" - filters: pending, pending_payment, pending_info
@@ -517,7 +517,7 @@ Total Tasks: 15 Task Groups
       - "Completed" - filters: completed
     - Map grouped option to individual status values in query
     - Filter applies to both sections or shows relevant section
-  - [ ] 12.5 Add status badges with colors
+  - [x] 12.5 Add status badges with colors
     - `pending`: Yellow/amber badge
     - `pending_payment`: Orange badge
     - `pending_info`: Blue badge
@@ -525,7 +525,7 @@ Total Tasks: 15 Task Groups
     - `in_testing`: Purple badge
     - `completed`: Green badge
     - Use existing Badge component
-  - [ ] 12.6 Add delete button to project cards
+  - [x] 12.6 Add delete button to project cards
     - Show delete button (trash icon) only for:
       - `created_by` = current user_id
       - `status` IN ('pending', 'pending_payment', 'pending_info')
@@ -533,14 +533,14 @@ Total Tasks: 15 Task Groups
     - Show confirmation dialog before deletion
     - Call `softDeleteProject()` function on confirm
     - Show success toast
-  - [ ] 12.7 Add clone button to project cards
+  - [x] 12.7 Add clone button to project cards
     - Show clone button only for:
       - `created_by` = current user_id
       - `deleted_at IS NULL`
     - Show confirmation dialog
     - Call `cloneProject()` function on confirm
     - Redirect to new project or show success toast
-  - [ ] 12.8 Ensure unified My Projects page tests pass
+  - [x] 12.8 Ensure unified My Projects page tests pass
     - Run ONLY the 4-5 tests written in 12.1
     - Verify page works correctly
     - Verify filtering and actions work
@@ -558,35 +558,35 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 8, Task Group 9
 
 - [x] 13.0 Complete project creation form updates
-  - [ ] 13.1 Write 4-5 focused tests for project creation form
+  - [x] 13.1 Write 4-5 focused tests for project creation form
     - Test: Form includes "I'm hiring you" checkbox
     - Test: Form includes "Save as Template" checkbox
     - Test: Form includes "Use Template" button
     - Test: Template selector dialog works correctly
     - Test: Form submission creates project with correct fields
-  - [ ] 13.2 Update ClientCreateProjectPage.tsx
+  - [x] 13.2 Update ClientCreateProjectPage.tsx
     - Update file: `src/pages/client/ClientCreateProjectPage.tsx`
     - Add checkbox: "I'm hiring you for this project" (default unchecked)
     - Add checkbox: "Save as Template" (optional, default unchecked)
     - Add "Use Template" button that opens template selector dialog
     - Store checkbox values in form state
-  - [ ] 13.3 Create template selector dialog component
+  - [x] 13.3 Create template selector dialog component
     - Create component: `src/components/project/TemplateSelectorDialog.tsx`
     - Fetch user's templates using `getTemplatesForUser()`
     - Display templates in list with name, category, last used date
     - Allow user to select template
     - Pre-fill form fields when template selected
     - Allow user to edit pre-filled fields
-  - [ ] 13.4 Update form submission logic
+  - [x] 13.4 Update form submission logic
     - On submit: create project with status = 'pending', created_by = current user_id, is_hiring_request = checkbox value
     - If "Save as Template" is checked, create template record after project creation
     - Display success toast and redirect to "My Projects" page
     - Show validation errors inline using shadcn/ui Alert components
-  - [ ] 13.5 Support pre-filling from cloned project
+  - [x] 13.5 Support pre-filling from cloned project
     - If coming from clone action, pre-fill form with cloned project data
     - Allow user to edit pre-filled fields
     - Remove " (Copy)" from title if user wants
-  - [ ] 13.6 Ensure project creation form tests pass
+  - [x] 13.6 Ensure project creation form tests pass
     - Run ONLY the 4-5 tests written in 13.1
     - Verify form works correctly
     - Verify template selection and saving work
@@ -604,20 +604,20 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 7
 
 - [x] 14.0 Complete comment thread components
-  - [ ] 14.1 Write 4-5 focused tests for comment thread components
+  - [x] 14.1 Write 4-5 focused tests for comment thread components
     - Test: ProjectCommentThread displays comments correctly
     - Test: ProjectCommentForm creates comment with attachments
     - Test: Reply functionality works for clients
     - Test: File uploads work correctly
     - Test: Status changes automatically when comments are created
-  - [ ] 14.2 Create ProjectCommentThread component
+  - [x] 14.2 Create ProjectCommentThread component
     - Create component: `src/components/project/ProjectCommentThread.tsx`
     - Display threaded comments with author name, role badge, timestamp
     - Show file attachments as download links or image thumbnails
     - Reply button for clients (when status is `pending_info`)
     - Admin can always add comments
     - Use existing Card and Badge components
-  - [ ] 14.3 Create ProjectCommentForm component
+  - [x] 14.3 Create ProjectCommentForm component
     - Create component: `src/components/project/ProjectCommentForm.tsx`
     - Textarea for comment content (required)
     - File upload component (PDF and images, max 50MB per file)
@@ -625,21 +625,21 @@ Total Tasks: 15 Task Groups
     - Store file metadata in `project_comment_attachments` table
     - Submit button disabled until content is provided
     - Use existing Input, Textarea, Button components
-  - [ ] 14.4 Add comment thread to client project detail page
+  - [x] 14.4 Add comment thread to client project detail page
     - Update file: `src/pages/client/ClientProjectDetailPage.tsx`
     - Add comment thread section
     - Display existing comments
     - Show comment form for clients (when status is `pending_info`) or admins (always)
-  - [ ] 14.5 Add comment thread to admin project detail page
+  - [x] 14.5 Add comment thread to admin project detail page
     - Update file: `src/pages/admin/ProjectDetailPage.tsx` or similar
     - Add comment thread section
     - Display existing comments
     - Show comment form for admins
-  - [ ] 14.6 Handle automatic status changes
+  - [x] 14.6 Handle automatic status changes
     - When admin creates comment: automatically change status to `pending_info` (if not already)
     - When client replies: automatically change status to `pending`
     - Show notifications when status changes
-  - [ ] 14.7 Ensure comment thread component tests pass
+  - [x] 14.7 Ensure comment thread component tests pass
     - Run ONLY the 4-5 tests written in 14.1
     - Verify components work correctly
     - Verify status changes work automatically
@@ -659,56 +659,56 @@ Total Tasks: 15 Task Groups
 **Dependencies:** Task Group 1, Task Group 7, Task Group 8
 
 - [x] 15.0 Complete integration updates and route removal
-  - [ ] 15.1 Write 3-4 focused tests for integration updates
+  - [x] 15.1 Write 3-4 focused tests for integration updates
     - Test: Notification types include new comment-related types
     - Test: Activity log event types include new project events
     - Test: Status filtering works on admin dashboard
     - Test: Route removal works correctly
-  - [ ] 15.2 Update notification system
+  - [x] 15.2 Update notification system
     - Update file: `src/lib/db/notifications.ts`
     - Extend `notification_type` enum to include: 'admin_requested_info', 'client_responded_info'
     - Create notifications when:
       - Admin creates comment on project: 'admin_requested_info' → client
       - Client replies to admin comment: 'client_responded_info' → admin
     - Update email templates for new notification types
-  - [ ] 15.3 Update activity logging
+  - [x] 15.3 Update activity logging
     - Update file: `src/lib/db/activityLog.ts`
     - Extend `activity_log_event_type` enum to include: 'project_status_changed', 'project_soft_deleted', 'project_hard_deleted', 'project_comment_added', 'project_cloned', 'template_created', 'template_used'
     - Ensure all new events are logged with proper event_data
-  - [ ] 15.4 Update admin dashboard status filtering
+  - [x] 15.4 Update admin dashboard status filtering
     - Update file: `src/pages/admin/ProjectList.tsx`
     - Update filter dropdown to use same grouped options as client dashboard:
       - "All", "Pending", "Active", "Completed"
     - Map grouped option to individual status values
     - Ensure consistent filter UI and behavior
-  - [ ] 15.5 Add delete functionality to admin project pages
+  - [x] 15.5 Add delete functionality to admin project pages
     - Add delete button to admin project list and detail pages
     - Show confirmation dialog
     - Call `hardDeleteProject()` function on confirm
     - Show success toast
-  - [ ] 15.6 Add delete functionality to invoice detail page
+  - [x] 15.6 Add delete functionality to invoice detail page
     - Update file: `src/pages/admin/InvoiceDetailPage.tsx` or similar
     - Add delete button
     - Show confirmation: "Are you sure you want to delete this invoice? The linked project will not be affected."
     - Call `deleteInvoice()` function on confirm
     - Show success toast
-  - [ ] 15.7 Remove /dashboard/requests route
+  - [x] 15.7 Remove /dashboard/requests route
     - Update file: `src/routes.tsx`
     - Remove `/dashboard/requests` route
     - Remove import for `MyRequestsPage` component
-  - [ ] 15.8 Remove "My Requests" navigation link
+  - [x] 15.8 Remove "My Requests" navigation link
     - Update file: `src/layouts/ClientLayout.tsx`
     - Remove "My Requests" link from navigation
     - Update navigation order if needed
-  - [ ] 15.9 Archive or remove MyRequestsPage.tsx
+  - [x] 15.9 Archive or remove MyRequestsPage.tsx
     - Archive `src/pages/client/MyRequestsPage.tsx` file (or remove)
     - Update any documentation or help text that references "My Requests"
-  - [ ] 15.10 Create file storage bucket for comment attachments
+  - [x] 15.10 Create file storage bucket for comment attachments
     - Create Supabase Storage bucket `project-comment-attachments` if not exists
     - Configure RLS policies: clients can upload files for their projects, admins can view all, clients can view files for their projects
     - File validation: PDF and images only (JPG, PNG, GIF, WebP)
     - Maximum file size: 50MB per file
-  - [ ] 15.11 Ensure integration updates tests pass
+  - [x] 15.11 Ensure integration updates tests pass
     - Run ONLY the 3-4 tests written in 15.1
     - Verify all integrations work correctly
     - Verify route removal works

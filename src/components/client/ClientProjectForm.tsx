@@ -3,15 +3,17 @@
  * Form for clients to create new projects (which will be pending approval)
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { X, Plus, Loader2, Upload, FileImage, FileText } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { X, Plus, Loader2, Upload, FileImage, FileText, FileCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -24,13 +26,14 @@ import {
   validateRequestAttachmentFile,
   getAttachmentFileType,
 } from '@/lib/storage'
-import {
-  createProjectRequest,
-  createProjectRequestAttachment,
-} from '@/lib/db/projectRequests'
 import { createProject } from '@/lib/db/projects'
+import { createTemplate } from '@/lib/db/projectTemplates'
+import { getProjectById } from '@/lib/db/projects'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
+import TemplateSelectorDialog from '@/components/project/TemplateSelectorDialog'
+import type { ProjectTemplateWithAttachments } from '@/lib/db/projectTemplates'
+import type { Project } from '@/lib/db/projects'
 
 const clientProjectFormSchema = z.object({
   title: z
@@ -58,6 +61,8 @@ const clientProjectFormSchema = z.object({
     .optional()
     .nullable(),
   attachments: z.array(z.instanceof(File)).optional(),
+  is_hiring_request: z.boolean().optional(),
+  save_as_template: z.boolean().optional(),
 })
 
 type ClientProjectFormData = z.infer<typeof clientProjectFormSchema>
@@ -72,10 +77,14 @@ export default function ClientProjectForm({
   onCancel,
 }: ClientProjectFormProps) {
   const { user } = useAuth()
+  const [searchParams] = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadingFiles, setUploadingFiles] = useState(false)
   const [techInput, setTechInput] = useState('')
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false)
+  const [isHiringRequest, setIsHiringRequest] = useState(false)
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false)
 
   const form = useForm<ClientProjectFormData>({
     resolver: zodResolver(clientProjectFormSchema),
@@ -89,8 +98,30 @@ export default function ClientProjectForm({
       special_requirements: '',
       payment_preference: null,
       attachments: [],
+      is_hiring_request: false,
+      save_as_template: false,
     },
   })
+
+  // Pre-fill form from cloned project if clone_id is in URL
+  useEffect(() => {
+    const cloneId = searchParams.get('clone_id')
+    if (cloneId && user?.id) {
+      getProjectById(cloneId)
+        .then((project) => {
+          if (project && project.created_by === user.id) {
+            form.setValue('title', project.title.replace(' (Copy)', ''))
+            form.setValue('description', project.description)
+            form.setValue('category', project.category as 'Web' | 'Mobile' | 'Full-Stack' | 'Design')
+            form.setValue('tech', project.tech)
+            setIsHiringRequest(project.is_hiring_request)
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to load cloned project:', error)
+        })
+    }
+  }, [searchParams, user?.id, form])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -127,6 +158,18 @@ export default function ClientProjectForm({
     setAttachmentFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const handleTemplateSelect = (template: ProjectTemplateWithAttachments) => {
+    form.setValue('title', template.title)
+    form.setValue('description', template.description)
+    form.setValue('category', template.category as 'Web' | 'Mobile' | 'Full-Stack' | 'Design')
+    form.setValue('tech', template.tech)
+    form.setValue('budget_range', template.budget_range || '')
+    form.setValue('timeline', template.timeline || '')
+    form.setValue('special_requirements', template.special_requirements || '')
+    setIsHiringRequest(template.is_hiring_request)
+    toast.success('Template loaded. You can edit the fields before submitting.')
+  }
+
   const onSubmit = async (data: ClientProjectFormData) => {
     if (!user?.id) {
       toast.error('You must be logged in to create a project')
@@ -137,34 +180,50 @@ export default function ClientProjectForm({
     setUploadingFiles(false)
 
     try {
-      // Create project with status 'pending_approval'
+      // Create project with status 'pending' (new unified status system)
       const project = await createProject({
         title: data.title,
         description: data.description,
         tech: data.tech,
         category: data.category,
-        status: 'pending_approval',
+        status: 'pending',
         created_by: user.id,
         client_id: user.id,
+        is_hiring_request: isHiringRequest,
         payment_preference: data.payment_preference || null,
         requires_payment: null, // Admin decides
         deposit_paid: false,
       })
 
-      // Upload attachments if any
-      if (attachmentFiles.length > 0) {
-        setUploadingFiles(true)
-
-        // Create a project request to link attachments
-        // Note: In the current implementation, we're creating a project directly
-        // Attachments could be stored separately or we could create a request record
-        // For now, we'll skip attachment uploads for direct project creation
-        // and focus on the project creation flow
+      // Save as template if checkbox is checked
+      if (saveAsTemplate) {
+        try {
+          await createTemplate({
+            userId: user.id,
+            templateName: `${data.title} Template`,
+            projectData: {
+              title: data.title,
+              description: data.description,
+              category: data.category,
+              tech: data.tech,
+              budget_range: data.budget_range || null,
+              timeline: data.timeline || null,
+              special_requirements: data.special_requirements || null,
+              is_hiring_request: isHiringRequest,
+            },
+          })
+          toast.success('Project and template created successfully!')
+        } catch (templateError) {
+          console.error('Failed to create template:', templateError)
+          toast.warning('Project created, but failed to save template.')
+        }
       }
 
-      toast.success('Project created successfully! It is now pending admin approval.')
+      toast.success('Project created successfully! It is now pending admin review.')
       form.reset()
       setAttachmentFiles([])
+      setIsHiringRequest(false)
+      setSaveAsTemplate(false)
       onSuccess?.()
     } catch (error) {
       console.error('Error creating project:', error)
@@ -356,6 +415,49 @@ export default function ClientProjectForm({
         </p>
       </div>
 
+      {/* Use Template Button */}
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setTemplateDialogOpen(true)}
+          className="flex items-center gap-2"
+        >
+          <FileCheck className="h-4 w-4" />
+          Use Template
+        </Button>
+      </div>
+
+      {/* I'm Hiring You Checkbox */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="is_hiring_request"
+          checked={isHiringRequest}
+          onCheckedChange={(checked) => setIsHiringRequest(checked === true)}
+        />
+        <Label
+          htmlFor="is_hiring_request"
+          className="text-sm font-normal cursor-pointer"
+        >
+          I'm hiring you for this project
+        </Label>
+      </div>
+
+      {/* Save as Template Checkbox */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="save_as_template"
+          checked={saveAsTemplate}
+          onCheckedChange={(checked) => setSaveAsTemplate(checked === true)}
+        />
+        <Label
+          htmlFor="save_as_template"
+          className="text-sm font-normal cursor-pointer"
+        >
+          Save as Template
+        </Label>
+      </div>
+
       {/* File Attachments */}
       <div className="space-y-2">
         <Label htmlFor="attachments">File Attachments (Optional)</Label>
@@ -434,6 +536,13 @@ export default function ClientProjectForm({
           )}
         </Button>
       </div>
+
+      {/* Template Selector Dialog */}
+      <TemplateSelectorDialog
+        open={templateDialogOpen}
+        onOpenChange={setTemplateDialogOpen}
+        onSelectTemplate={handleTemplateSelect}
+      />
     </form>
   )
 }

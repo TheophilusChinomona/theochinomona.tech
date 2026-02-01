@@ -82,20 +82,60 @@ export async function createInvoice(data: CreateInvoiceInput): Promise<InvoiceWi
     throw new Error(`Failed to create line items: ${lineItemsError.message}`)
   }
 
-  // Log activity
+  // Automatically update project status to pending_payment when invoice is created
   if (invoice.project_id) {
     try {
-      await logActivity(
-        invoice.project_id,
-        'invoice_created',
-        {
-          invoice_id: invoice.id,
-          invoice_number: invoice.invoice_number,
-          total: invoice.total,
+      const { getProjectById, updateProject } = await import('./projects')
+      const project = await getProjectById(invoice.project_id)
+
+      if (project) {
+        const oldStatus = project.status
+        await updateProject(invoice.project_id, { status: 'pending_payment' })
+
+        // Log status change activity
+        await logActivity(
+          invoice.project_id,
+          'project_status_changed',
+          {
+            old_status: oldStatus,
+            new_status: 'pending_payment',
+            reason: 'Invoice created',
+            invoice_id: invoice.id,
+            invoice_number: invoice.invoice_number,
+          }
+        )
+
+        // Log invoice creation activity
+        await logActivity(
+          invoice.project_id,
+          'invoice_created',
+          {
+            invoice_id: invoice.id,
+            invoice_number: invoice.invoice_number,
+            total: invoice.total,
+          }
+        )
+
+        // Send notification to client
+        try {
+          const { createNotification } = await import('./notifications')
+          await createNotification(
+            invoice.client_id,
+            'invoice_sent',
+            'Invoice Created',
+            `An invoice (${invoice.invoice_number}) has been created for your project.`,
+            {
+              invoice_id: invoice.id,
+              project_id: invoice.project_id,
+              invoice_number: invoice.invoice_number,
+            }
+          )
+        } catch (e) {
+          console.error('Failed to send invoice notification:', e)
         }
-      )
+      }
     } catch (e) {
-      console.error('Failed to log invoice creation activity:', e)
+      console.error('Failed to update project status or log activity:', e)
     }
   }
 

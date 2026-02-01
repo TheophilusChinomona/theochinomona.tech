@@ -7,12 +7,14 @@ import { Link } from 'react-router-dom'
 import { Clock, CheckCircle, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { Project } from '@/lib/db/projects'
+import type { ReactNode } from 'react'
 
 interface ClientProjectCardProps {
   project: Project
   phaseCount?: number
   completedPhases?: number
   lastActivityDate?: string
+  statusBadge?: ReactNode
 }
 
 export default function ClientProjectCard({
@@ -20,6 +22,7 @@ export default function ClientProjectCard({
   phaseCount = 0,
   completedPhases = 0,
   lastActivityDate,
+  statusBadge,
 }: ClientProjectCardProps) {
   const progress = phaseCount > 0 ? Math.round((completedPhases / phaseCount) * 100) : 0
   const isCompleted = phaseCount > 0 && completedPhases === phaseCount
@@ -70,7 +73,7 @@ export default function ClientProjectCard({
           </h3>
           <p className="text-sm text-zinc-400 mt-1">{project.category}</p>
         </div>
-        {getStatusBadge()}
+        {statusBadge || getStatusBadge()}
       </div>
 
       {/* Progress Bar */}
@@ -102,10 +105,13 @@ export default function ClientProjectCard({
         )}
       </div>
 
-      {/* View Arrow */}
-      <div className="mt-4 flex items-center gap-1 text-sm text-indigo-400 group-hover:text-indigo-300 transition-colors">
-        View details
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      {/* View Arrow and Action Buttons */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-1 text-sm text-indigo-400 group-hover:text-indigo-300 transition-colors">
+          View details
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </div>
+        {/* Action buttons will be rendered here by parent component */}
       </div>
     </Link>
   )

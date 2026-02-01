@@ -253,6 +253,75 @@ export async function uploadProjectRequestAttachment(
   return urlData.publicUrl
 }
 
+// ============================================================================
+// Project Comment Attachments Storage Functions
+// ============================================================================
+
+const COMMENT_ATTACHMENTS_BUCKET = 'project-comment-attachments'
+
+/**
+ * Generates a unique filename for comment attachments
+ */
+function generateCommentAttachmentFileName(
+  commentId: string,
+  originalName: string
+): string {
+  const timestamp = Date.now()
+  const extension = originalName.split('.').pop() || 'pdf'
+  const baseName = originalName
+    .replace(/\.[^/.]+$/, '') // Remove extension
+    .replace(/[^a-zA-Z0-9.-]/g, '_')
+    .slice(0, 50)
+  return `comment-${commentId}-${timestamp}-${baseName}.${extension}`
+}
+
+/**
+ * Upload a project comment attachment to Supabase Storage
+ * 
+ * @param file - The file to upload (PDF or image)
+ * @param commentId - The ID of the comment
+ * @returns The public URL of the uploaded file
+ * @throws Error if upload fails or file validation fails
+ */
+export async function uploadProjectCommentAttachment(
+  file: File,
+  commentId: string
+): Promise<string> {
+  // Validate file
+  validateRequestAttachmentFile(file)
+
+  // Generate unique filename
+  const fileName = generateCommentAttachmentFileName(commentId, file.name)
+  const filePath = `attachments/${fileName}`
+
+  // Upload file to Supabase Storage
+  const { data, error } = await supabase.storage
+    .from(COMMENT_ATTACHMENTS_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false, // Don't overwrite existing files
+    })
+
+  if (error) {
+    throw new Error(`Failed to upload file: ${error.message}`)
+  }
+
+  if (!data) {
+    throw new Error('Upload succeeded but no data returned')
+  }
+
+  // Get public URL
+  const { data: urlData } = supabase.storage
+    .from(COMMENT_ATTACHMENTS_BUCKET)
+    .getPublicUrl(filePath)
+
+  if (!urlData?.publicUrl) {
+    throw new Error('Failed to get public URL for uploaded file')
+  }
+
+  return urlData.publicUrl
+}
+
 /**
  * Delete a project request attachment from Supabase Storage
  * 

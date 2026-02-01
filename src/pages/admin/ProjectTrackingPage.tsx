@@ -45,6 +45,7 @@ import {
 import { toast } from 'sonner'
 import PhaseCard from '@/components/admin/PhaseCard'
 import AddPhaseDialog from '@/components/admin/AddPhaseDialog'
+import ProjectCommentThread from '@/components/project/ProjectCommentThread'
 import type { ProjectTask } from '@/lib/db/tracking'
 
 export default function ProjectTrackingPage() {
@@ -398,6 +399,17 @@ export default function ProjectTrackingPage() {
           </DndContext>
         )}
       </div>
+
+      {/* Comment Thread */}
+      <Card>
+        <CardContent className="p-6">
+          <ProjectCommentThread
+            projectId={projectId!}
+            projectStatus={project.status}
+            canReply={true}
+          />
+        </CardContent>
+      </Card>
 
       {/* Regenerate Code Dialog */}
       <AlertDialog open={regenerateDialogOpen} onOpenChange={setRegenerateDialogOpen}>

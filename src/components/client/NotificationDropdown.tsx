@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bell, Megaphone, ArrowRight, Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,9 +27,13 @@ import ReleaseNoteModal from './ReleaseNoteModal'
 import type { ReleaseNote } from '@/lib/db/types/dashboard'
 
 export default function NotificationDropdown() {
+  const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [selectedReleaseNote, setSelectedReleaseNote] = useState<ReleaseNote | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  
+  // Determine notifications page URL based on user role
+  const notificationsUrl = user?.role === 'admin' ? '/admin/notifications' : '/dashboard/notifications'
 
   const { data: notifications, isLoading: notificationsLoading } = useNotifications(10)
   const { data: unreadCount = 0 } = useUnreadCount()
@@ -186,7 +191,7 @@ export default function NotificationDropdown() {
           {/* Footer */}
           <div className="border-t border-zinc-800 p-2">
             <Link
-              to="/dashboard/notifications"
+              to={notificationsUrl}
               onClick={() => setOpen(false)}
               className="flex items-center justify-center gap-2 w-full py-2 text-sm text-zinc-400 hover:text-zinc-100 transition-colors"
             >

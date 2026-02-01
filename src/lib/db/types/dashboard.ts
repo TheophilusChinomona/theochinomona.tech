@@ -45,6 +45,13 @@ export type ActivityLogEventType =
   | 'invoice_sent'
   | 'payment_received'
   | 'refund_processed'
+  | 'project_status_changed'
+  | 'project_soft_deleted'
+  | 'project_hard_deleted'
+  | 'project_comment_added'
+  | 'project_cloned'
+  | 'template_created'
+  | 'template_used'
 
 export interface ActivityLogEntry {
   id: string
@@ -79,6 +86,8 @@ export type NotificationType =
   | 'payment_failed'
   | 'invoice_overdue'
   | 'refund_processed'
+  | 'admin_requested_info'
+  | 'client_responded_info'
 
 export interface Notification {
   id: string
