@@ -54,6 +54,18 @@ export default function Hero({
         data-testid="hero-full"
         className={cn('relative h-screen flex items-center justify-center overflow-hidden', className)}
       >
+        {/* Hero background image */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'url(/images/hero/hero-bg.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 z-0 bg-zinc-950/70" />
+        
         <FluidBackground />
         
         <MouseParallaxContainer
