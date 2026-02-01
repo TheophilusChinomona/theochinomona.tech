@@ -22,9 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  uploadProjectRequestAttachment,
   validateRequestAttachmentFile,
-  getAttachmentFileType,
 } from '@/lib/storage'
 import { createProject } from '@/lib/db/projects'
 import { createTemplate } from '@/lib/db/projectTemplates'
@@ -33,7 +31,6 @@ import { useAuth } from '@/hooks/useAuth'
 import { toast } from 'sonner'
 import TemplateSelectorDialog from '@/components/project/TemplateSelectorDialog'
 import type { ProjectTemplateWithAttachments } from '@/lib/db/projectTemplates'
-import type { Project } from '@/lib/db/projects'
 
 const clientProjectFormSchema = z.object({
   title: z
@@ -124,14 +121,14 @@ export default function ClientProjectForm({
   }, [searchParams, user?.id, form])
 
   const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'tech',
+    control: form.control as never,
+    name: 'tech' as never,
   })
 
   const handleAddTech = () => {
     const trimmed = techInput.trim()
     if (trimmed && !form.getValues('tech').includes(trimmed)) {
-      append(trimmed)
+      append(trimmed as never)
       setTechInput('')
     }
   }
@@ -181,7 +178,7 @@ export default function ClientProjectForm({
 
     try {
       // Create project with status 'pending' (new unified status system)
-      const project = await createProject({
+      await createProject({
         title: data.title,
         description: data.description,
         tech: data.tech,

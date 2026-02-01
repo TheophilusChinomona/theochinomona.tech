@@ -6,6 +6,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import { Search, MoreVertical, Edit, Trash2, Eye, Plus, ClipboardList, Filter } from 'lucide-react'
 import {
   getAllProjects,
@@ -59,6 +60,7 @@ export default function ProjectList() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
 
   const {
     data: projects,
@@ -99,7 +101,7 @@ export default function ProjectList() {
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ projectId, status }: { projectId: string; status: ProjectStatus }) =>
-      updateProjectStatus(projectId, status),
+      updateProjectStatus(projectId, status, user?.id || ''),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] })

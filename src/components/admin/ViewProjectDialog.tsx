@@ -51,13 +51,13 @@ export default function ViewProjectDialog({
             <div>
               <label className="text-sm font-medium text-zinc-400">Status</label>
               <div className="mt-1">
-                {project.status === 'published' ? (
+                {project.status === 'completed' ? (
                   <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                    Published
+                    Completed
                   </Badge>
                 ) : (
                   <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-                    Draft
+                    {project.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </Badge>
                 )}
               </div>

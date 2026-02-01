@@ -81,7 +81,6 @@ export default function ProjectCommentForm({
 
     try {
       // Upload attachments first
-      const attachments = []
       for (const file of attachmentFiles) {
         try {
           // We need to create the comment first to get the comment ID

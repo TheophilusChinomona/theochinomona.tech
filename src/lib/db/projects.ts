@@ -463,9 +463,6 @@ export async function cloneProject(
     tech: originalProject.tech,
     client_name: originalProject.client_name,
     client_id: originalProject.client_id,
-    budget_range: null, // These fields don't exist in CreateProjectInput, but we'll handle them if needed
-    timeline: null,
-    special_requirements: null,
     is_hiring_request: originalProject.is_hiring_request,
     status: 'pending',
     created_by: userId,

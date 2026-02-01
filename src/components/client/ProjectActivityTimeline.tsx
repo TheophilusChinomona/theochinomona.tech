@@ -84,6 +84,41 @@ const eventTypeConfig: Record<
     color: 'text-purple-400',
     bgColor: 'bg-purple-500/10',
   },
+  project_status_changed: {
+    icon: Edit,
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/10',
+  },
+  project_soft_deleted: {
+    icon: Activity,
+    color: 'text-red-400',
+    bgColor: 'bg-red-500/10',
+  },
+  project_hard_deleted: {
+    icon: Activity,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+  },
+  project_comment_added: {
+    icon: FileText,
+    color: 'text-sky-400',
+    bgColor: 'bg-sky-500/10',
+  },
+  project_cloned: {
+    icon: FolderPlus,
+    color: 'text-teal-400',
+    bgColor: 'bg-teal-500/10',
+  },
+  template_created: {
+    icon: FileText,
+    color: 'text-violet-400',
+    bgColor: 'bg-violet-500/10',
+  },
+  template_used: {
+    icon: FileText,
+    color: 'text-violet-400',
+    bgColor: 'bg-violet-500/10',
+  },
 }
 
 function formatDateTime(dateStr: string): { date: string; time: string } {

@@ -41,6 +41,8 @@ const notificationTypeConfig: Record<
   payment_failed: { icon: AlertCircle, color: 'text-red-400' },
   invoice_overdue: { icon: AlertCircle, color: 'text-orange-400' },
   refund_processed: { icon: Receipt, color: 'text-zinc-400' },
+  admin_requested_info: { icon: AlertCircle, color: 'text-amber-400' },
+  client_responded_info: { icon: FolderKanban, color: 'text-teal-400' },
 }
 
 function getTimeAgo(dateStr: string): string {

@@ -86,7 +86,7 @@ export default function ClientProjectDetailPage() {
       if (!acc[task.phase_id]) {
         acc[task.phase_id] = []
       }
-      acc[task.phase_id].push(task)
+      acc[task.phase_id]!.push(task)
       return acc
     },
     {} as Record<string, typeof allTasks>

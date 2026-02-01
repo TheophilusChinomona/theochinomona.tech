@@ -168,8 +168,8 @@ export async function updateProjectRequest(
  */
 export async function approveProjectRequest(
   requestId: string,
-  requiresPayment: boolean,
-  invoiceId?: string
+  _requiresPayment: boolean,
+  _invoiceId?: string
 ): Promise<ProjectRequest> {
   // Update request status to approved
   const updates: UpdateProjectRequestInput = {
@@ -251,7 +251,7 @@ export async function deleteProjectRequestAttachment(
   attachmentId: string
 ): Promise<void> {
   // First get the attachment to get the file URL
-  const { data: attachment, error: fetchError } = await supabase
+  const { error: fetchError } = await supabase
     .from('project_request_attachments')
     .select('file_url')
     .eq('id', attachmentId)

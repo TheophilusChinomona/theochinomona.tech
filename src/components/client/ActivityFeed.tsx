@@ -83,6 +83,41 @@ const eventTypeConfig: Record<
     color: 'text-zinc-400',
     label: 'Refund processed',
   },
+  project_status_changed: {
+    icon: Edit,
+    color: 'text-blue-400',
+    label: 'Status changed',
+  },
+  project_soft_deleted: {
+    icon: Activity,
+    color: 'text-red-400',
+    label: 'Project archived',
+  },
+  project_hard_deleted: {
+    icon: Activity,
+    color: 'text-red-500',
+    label: 'Project deleted',
+  },
+  project_comment_added: {
+    icon: FileText,
+    color: 'text-sky-400',
+    label: 'Comment added',
+  },
+  project_cloned: {
+    icon: FolderPlus,
+    color: 'text-teal-400',
+    label: 'Project cloned',
+  },
+  template_created: {
+    icon: FileText,
+    color: 'text-violet-400',
+    label: 'Template created',
+  },
+  template_used: {
+    icon: FileText,
+    color: 'text-violet-400',
+    label: 'Template used',
+  },
 }
 
 function getTimeAgo(dateStr: string): string {

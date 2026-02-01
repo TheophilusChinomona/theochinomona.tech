@@ -26,7 +26,7 @@ interface ProjectCommentThreadProps {
 export default function ProjectCommentThread({
   projectId,
   projectStatus,
-  canReply = false,
+  canReply: _canReply = false,
 }: ProjectCommentThreadProps) {
   const { user } = useAuth()
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
@@ -64,7 +64,7 @@ export default function ProjectCommentThread({
   }
 
   const renderComment = (
-    comment: ProjectCommentWithAttachments,
+    comment: ProjectCommentWithAttachments & { replies?: ProjectCommentWithAttachments[] },
     isReply = false
   ) => {
     // Handle case where user data might be null due to RLS

@@ -15,7 +15,6 @@ import {
   Settings,
   Home,
   CreditCard,
-  ClipboardList,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/hooks/useAuth'
