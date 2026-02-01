@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Hero from '@/components/Hero'
+import AnimatedGradientHero from '@/components/AnimatedGradientHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
@@ -45,13 +45,7 @@ const featuredProjects = [
 export default function HomePage() {
   return (
     <>
-      <Hero
-        variant="full"
-        title="Theo Chinomona"
-        subtitle="Full-Stack Developer & Creative Problem Solver"
-        ctaText="Let's Build Something"
-        ctaLink="/contact"
-      />
+      <AnimatedGradientHero />
 
       {/* Introduction Section */}
       <section className="py-20 bg-zinc-900/50">
