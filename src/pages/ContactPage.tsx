@@ -11,9 +11,11 @@ export default function ContactPage() {
         title="Get In Touch"
         subtitle="Let's work together on your next project"
         image={
-          <div className="w-full h-64 bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
-            Contact Visual Placeholder
-          </div>
+          <img 
+            src="/images/contact-hero.jpg" 
+            alt="Abstract network visualization representing connection and collaboration" 
+            className="w-full h-64 object-cover rounded-lg border border-slate-200 dark:border-slate-800"
+          />
         }
       />
 

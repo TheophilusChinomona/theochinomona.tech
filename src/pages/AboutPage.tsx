@@ -57,9 +57,11 @@ export default function AboutPage() {
         title="About Me"
         subtitle="Passionate developer building beautiful, functional web experiences"
         image={
-          <div className="w-full h-64 bg-gradient-to-br from-indigo-500/20 to-indigo-600/20 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800">
-            Profile Image Placeholder
-          </div>
+          <img 
+            src="/images/about-hero.jpg" 
+            alt="Developer workspace with dual monitors displaying code" 
+            className="w-full h-64 object-cover rounded-lg border border-slate-200 dark:border-slate-800"
+          />
         }
       />
 
