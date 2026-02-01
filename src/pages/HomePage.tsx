@@ -3,19 +3,17 @@ import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { 
-  Code, 
-  Palette, 
   Smartphone, 
-  Database, 
   Cloud, 
   ExternalLink
 } from 'lucide-react'
+import { SiReact, SiTypescript, SiNodedotjs, SiTailwindcss } from 'react-icons/si'
 
 const skills = [
-  { name: 'React', icon: Code, color: 'text-blue-400' },
-  { name: 'TypeScript', icon: Code, color: 'text-blue-500' },
-  { name: 'Node.js', icon: Database, color: 'text-green-400' },
-  { name: 'Tailwind CSS', icon: Palette, color: 'text-cyan-400' },
+  { name: 'React', icon: SiReact, color: 'text-blue-400' },
+  { name: 'TypeScript', icon: SiTypescript, color: 'text-blue-600' },
+  { name: 'Node.js', icon: SiNodedotjs, color: 'text-green-500' },
+  { name: 'Tailwind CSS', icon: SiTailwindcss, color: 'text-cyan-400' },
   { name: 'Mobile', icon: Smartphone, color: 'text-purple-400' },
   { name: 'Cloud', icon: Cloud, color: 'text-orange-400' },
 ]
@@ -26,18 +24,21 @@ const featuredProjects = [
     title: 'E-Commerce Platform',
     description: 'Full-stack e-commerce solution with payment integration',
     tech: ['React', 'Node.js', 'PostgreSQL'],
+    thumbnail: '/images/projects/ecommerce.jpg',
   },
   {
     id: '2',
     title: 'Task Management App',
     description: 'Collaborative task management with real-time updates',
     tech: ['React', 'TypeScript', 'WebSocket'],
+    thumbnail: '/images/projects/task-management.jpg',
   },
   {
     id: '3',
     title: 'Portfolio Website',
     description: 'Modern portfolio site with dark theme and animations',
     tech: ['React', 'Tailwind', 'Framer Motion'],
+    thumbnail: '/images/projects/portfolio.jpg',
   },
 ]
 
@@ -48,7 +49,7 @@ export default function HomePage() {
         variant="full"
         title="Theo Chinomona"
         subtitle="Full-Stack Developer & Creative Problem Solver"
-        ctaText="Get In Touch"
+        ctaText="Let's Build Something"
         ctaLink="/contact"
       />
 
@@ -106,7 +107,17 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProjects.map((project) => (
-              <Card key={project.id} className="hover:bg-zinc-800 transition-colors">
+              <Card key={project.id} className="overflow-hidden hover:bg-zinc-800 transition-colors group">
+                {project.thumbnail && (
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <img
+                      src={project.thumbnail}
+                      alt={project.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                  </div>
+                )}
                 <CardHeader>
                   <CardTitle>{project.title}</CardTitle>
                   <CardDescription>{project.description}</CardDescription>

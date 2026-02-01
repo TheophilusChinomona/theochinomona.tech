@@ -11,9 +11,9 @@ const navLinks = [
 ]
 
 const socialLinks = [
-  { name: 'GitHub', href: 'https://github.com', icon: Github },
-  { name: 'LinkedIn', href: 'https://linkedin.com', icon: Linkedin },
-  { name: 'Twitter', href: 'https://twitter.com', icon: Twitter },
+  { name: 'GitHub', href: 'https://github.com/TheophilusChinomona', icon: Github },
+  { name: 'LinkedIn', href: 'https://linkedin.com/in/theochinomona', icon: Linkedin },
+  { name: 'Twitter', href: 'https://twitter.com/theochinomona', icon: Twitter },
   { name: 'Email', href: 'mailto:hello@theochinomona.tech', icon: Mail },
 ]
 
@@ -27,7 +27,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link to="/" className="text-xl font-bold text-white">
-              theo.dev
+              theochinomona.tech
             </Link>
             <p className="mt-2 text-zinc-400 text-sm">
               Building beautiful, functional web experiences.

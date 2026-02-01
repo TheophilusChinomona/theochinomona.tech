@@ -26,6 +26,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Full-stack e-commerce solution with payment integration, inventory management, and admin dashboard.',
     tech: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
     category: 'Full-Stack',
+    thumbnail: '/images/projects/ecommerce.jpg',
   },
   {
     id: '2',
@@ -33,6 +34,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Collaborative task management application with real-time updates and team collaboration features.',
     tech: ['React', 'TypeScript', 'WebSocket', 'MongoDB'],
     category: 'Web',
+    thumbnail: '/images/projects/task-management.jpg',
   },
   {
     id: '3',
@@ -40,6 +42,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Cross-platform mobile app for tracking workouts, nutrition, and fitness goals.',
     tech: ['React Native', 'Firebase', 'TypeScript'],
     category: 'Mobile',
+    thumbnail: '/images/projects/fitness-app.jpg',
   },
   {
     id: '4',
@@ -47,6 +50,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Modern portfolio website with dark theme, smooth animations, and responsive design.',
     tech: ['React', 'Tailwind', 'Framer Motion'],
     category: 'Web',
+    thumbnail: '/images/projects/portfolio.jpg',
   },
   {
     id: '5',
@@ -54,6 +58,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Analytics dashboard for SaaS platform with data visualization and reporting features.',
     tech: ['Next.js', 'TypeScript', 'Chart.js', 'PostgreSQL'],
     category: 'Full-Stack',
+    thumbnail: '/images/projects/saas-dashboard.jpg',
   },
   {
     id: '6',
@@ -61,6 +66,7 @@ const hardcodedProjects: ProjectCardProps[] = [
     description: 'Comprehensive design system with reusable components, documentation, and style guide.',
     tech: ['React', 'Storybook', 'Tailwind', 'TypeScript'],
     category: 'Design',
+    thumbnail: '/images/projects/design-system.jpg',
   },
 ]
 

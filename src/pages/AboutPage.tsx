@@ -38,14 +38,14 @@ const timelineItems: TimelineItem[] = [
     description: 'Started working as a freelance developer, building custom web applications for clients.',
   },
   {
-    date: '2023',
+    date: '2023-2024',
     title: 'Advanced Technologies',
-    description: 'Mastered TypeScript, cloud deployment, and modern development practices. Launched multiple production applications.',
+    description: 'Mastered TypeScript, cloud deployment, AI integration, and modern development practices. Launched multiple production applications.',
   },
   {
-    date: '2024',
+    date: '2025-2026',
     title: 'Current Focus',
-    description: 'Continuing to build innovative solutions, focusing on performance, accessibility, and user experience.',
+    description: 'Building AI-powered solutions, self-hosted infrastructure with Dokploy, and automation workflows. Focus on performance and developer experience.',
   },
 ]
 
