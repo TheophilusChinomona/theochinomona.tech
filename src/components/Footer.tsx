@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Github, Linkedin, Twitter, Mail } from 'lucide-react'
+import { Github, Twitter, Facebook, Mail } from 'lucide-react'
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -12,8 +12,8 @@ const navLinks = [
 
 const socialLinks = [
   { name: 'GitHub', href: 'https://github.com/TheophilusChinomona', icon: Github },
-  { name: 'LinkedIn', href: 'https://linkedin.com/in/theochinomona', icon: Linkedin },
-  { name: 'Twitter', href: 'https://twitter.com/theochinomona', icon: Twitter },
+  { name: 'Twitter', href: 'https://x.com/ssh_id_rsa_tino?s=21', icon: Twitter },
+  { name: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61583528712917', icon: Facebook },
   { name: 'Email', href: 'mailto:hello@theochinomona.tech', icon: Mail },
 ]
 
