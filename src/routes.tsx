@@ -5,6 +5,7 @@ import ClientLayout from './layouts/ClientLayout'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import PortfolioPage from './pages/PortfolioPage'
+import PortfolioDetailPage from './pages/PortfolioDetailPage'
 import BlogPage from './pages/BlogPage'
 import ContactPage from './pages/ContactPage'
 import LoginPage from './pages/LoginPage'
@@ -59,6 +60,7 @@ export default function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/portfolio/:projectId" element={<PortfolioDetailPage />} />
         <Route path="/track" element={<TrackingLandingPage />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/contact" element={<ContactPage />} />

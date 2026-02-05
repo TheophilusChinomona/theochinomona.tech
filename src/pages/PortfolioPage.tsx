@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import Hero from '@/components/Hero'
 import ProjectCard, { type ProjectCardProps } from '@/components/ProjectCard'
 import { Button } from '@/components/ui/button'
@@ -19,54 +20,31 @@ import { getPublishedProjects, type Project } from '@/lib/db/projects'
 
 const categories = ['All', 'Web', 'Mobile', 'Full-Stack', 'Design']
 
-const hardcodedProjects: ProjectCardProps[] = [
+// Real portfolio projects
+const portfolioProjects: ProjectCardProps[] = [
   {
-    id: '1',
-    title: 'E-Commerce Platform',
-    description: 'Full-stack e-commerce solution with payment integration, inventory management, and admin dashboard.',
-    tech: ['React', 'Node.js', 'PostgreSQL', 'Stripe'],
-    category: 'Full-Stack',
-    thumbnail: '/images/projects/ecommerce.jpg',
-  },
-  {
-    id: '2',
-    title: 'Task Management App',
-    description: 'Collaborative task management application with real-time updates and team collaboration features.',
-    tech: ['React', 'TypeScript', 'WebSocket', 'MongoDB'],
+    id: 'portfolio-planzy',
+    title: 'Planzy Studio',
+    description: 'Creative agency portfolio showcasing studio capabilities with modern design and smooth animations.',
+    tech: ['React', 'Tailwind CSS', 'Framer Motion', 'Vite'],
     category: 'Web',
-    thumbnail: '/images/projects/task-management.jpg',
+    thumbnail: '/images/projects/planzy.jpg',
   },
   {
-    id: '3',
-    title: 'Mobile Fitness Tracker',
-    description: 'Cross-platform mobile app for tracking workouts, nutrition, and fitness goals.',
-    tech: ['React Native', 'Firebase', 'TypeScript'],
-    category: 'Mobile',
-    thumbnail: '/images/projects/fitness-app.jpg',
-  },
-  {
-    id: '4',
-    title: 'Portfolio Website',
-    description: 'Modern portfolio website with dark theme, smooth animations, and responsive design.',
-    tech: ['React', 'Tailwind', 'Framer Motion'],
+    id: 'portfolio-ibstrategies',
+    title: 'IBStrategies',
+    description: 'Business consulting website with ISO certification services and SHREQ training programs.',
+    tech: ['React', 'TypeScript', 'CMS', 'Responsive Design'],
     category: 'Web',
-    thumbnail: '/images/projects/portfolio.jpg',
+    thumbnail: '/images/projects/ibstrategies.jpg',
   },
   {
-    id: '5',
-    title: 'SaaS Dashboard',
-    description: 'Analytics dashboard for SaaS platform with data visualization and reporting features.',
-    tech: ['Next.js', 'TypeScript', 'Chart.js', 'PostgreSQL'],
-    category: 'Full-Stack',
-    thumbnail: '/images/projects/saas-dashboard.jpg',
-  },
-  {
-    id: '6',
-    title: 'UI Design System',
-    description: 'Comprehensive design system with reusable components, documentation, and style guide.',
-    tech: ['React', 'Storybook', 'Tailwind', 'TypeScript'],
-    category: 'Design',
-    thumbnail: '/images/projects/design-system.jpg',
+    id: 'portfolio-acbf',
+    title: 'ACBF RSA',
+    description: 'African Cyber Battlefield Forum - Cybersecurity event platform empowering communities.',
+    tech: ['React', 'Node.js', 'Events', 'Community'],
+    category: 'Web',
+    thumbnail: '/images/projects/acbf.jpg',
   },
 ]
 
@@ -109,9 +87,9 @@ export default function PortfolioPage() {
     [dbProjects]
   )
 
-  // Merge hardcoded and database projects
+  // Merge portfolio projects and database projects
   const allProjects = useMemo(
-    () => [...hardcodedProjects, ...dbProjectsFormatted],
+    () => [...portfolioProjects, ...dbProjectsFormatted],
     [dbProjectsFormatted]
   )
 

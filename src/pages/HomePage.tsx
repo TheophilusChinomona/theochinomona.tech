@@ -20,28 +20,25 @@ const skills = [
 
 const featuredProjects = [
   {
-    id: '1',
+    id: 'portfolio-planzy',
     title: 'Planzy Studio',
     description: 'Creative agency portfolio with modern design and project showcase',
     tech: ['React', 'Tailwind', 'Animations'],
     thumbnail: '/images/projects/planzy.jpg',
-    link: 'https://planzy.theochinomona.tech',
   },
   {
-    id: '2',
+    id: 'portfolio-ibstrategies',
     title: 'IBStrategies',
     description: 'Business consulting firm website with professional branding',
     tech: ['React', 'TypeScript', 'CMS'],
     thumbnail: '/images/projects/ibstrategies.jpg',
-    link: 'https://ibstrategies.co.za',
   },
   {
-    id: '3',
+    id: 'portfolio-acbf',
     title: 'ACBF',
     description: 'African Cyber Battlefield Forum - cybersecurity event platform',
     tech: ['React', 'Node.js', 'Events'],
     thumbnail: '/images/projects/acbf.jpg',
-    link: 'https://acbf.org.za',
   },
 ]
 
@@ -104,47 +101,41 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProjects.map((project) => (
-              <Card key={project.id} className="overflow-hidden hover:bg-zinc-800 transition-colors group">
-                {project.thumbnail && (
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <img
-                      src={project.thumbnail}
-                      alt={project.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                    {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900/60"
-                      >
+              <Link key={project.id} to={`/portfolio/${project.id.replace('portfolio-', '')}`}>
+                <Card className="overflow-hidden hover:bg-zinc-800 transition-colors group cursor-pointer h-full">
+                  {project.thumbnail && (
+                    <div className="relative h-48 w-full overflow-hidden">
+                      <img
+                        src={project.thumbnail}
+                        alt={project.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900/60">
                         <span className="flex items-center gap-2 px-4 py-2 bg-white text-zinc-900 rounded-lg font-medium">
-                          <ExternalLink className="w-4 h-4" />
-                          View Project
+                          View Details
                         </span>
-                      </a>
-                    )}
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle>{project.title}</CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-2 py-1 text-xs bg-zinc-800 text-zinc-300 rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      </div>
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle>{project.title}</CardTitle>
+                    <CardDescription>{project.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {project.tech.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-1 text-xs bg-zinc-800 text-zinc-300 rounded"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
