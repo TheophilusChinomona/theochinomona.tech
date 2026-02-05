@@ -110,13 +110,13 @@ export default function Navbar() {
               )
             })}
 
-            {/* Desktop Auth Button */}
+            {/* Desktop Auth Button - styled as CTA */}
             {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                    className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 ml-2"
                     aria-label={`User menu for ${getUserDisplayName()}`}
                   >
                     <User className="w-4 h-4 mr-2" />
@@ -149,9 +149,9 @@ export default function Navbar() {
               </DropdownMenu>
             ) : (
               <Button
-                variant="ghost"
+                variant="default"
                 onClick={handleAuthClick}
-                className="text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                className="ml-4 bg-indigo-600 hover:bg-indigo-700 text-white"
                 aria-label="Login"
               >
                 Login
@@ -201,7 +201,7 @@ export default function Navbar() {
                 )
               })}
 
-              {/* Mobile Auth Button */}
+              {/* Mobile Auth Button - styled as primary */}
               {isAuthenticated && user ? (
                 <div className="pt-2 mt-2 border-t border-zinc-800 space-y-1">
                   <div className="px-4 py-2 text-sm text-zinc-300">
@@ -227,13 +227,14 @@ export default function Navbar() {
                   </button>
                 </div>
               ) : (
-                <button
+                <Button
+                  variant="default"
                   onClick={handleAuthClick}
-                  className="block w-full text-left px-4 py-3 rounded-lg text-base font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
+                  className="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white"
                   aria-label="Login"
                 >
                   Login
-                </button>
+                </Button>
               )}
             </div>
           </motion.div>
