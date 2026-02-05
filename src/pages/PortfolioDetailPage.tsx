@@ -1,9 +1,8 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink, Github, Calendar, Tag, Code, Layout, Zap } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Calendar, Code, Layout, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
 
 // Project data with detailed information
 const projectsData: Record<string, {
@@ -94,7 +93,7 @@ const projectsData: Record<string, {
   'acbf': {
     id: 'acbf',
     title: 'ACBF RSA',
-    tagline: 'African Cyber id: 'ac Battlefield Forum',
+    tagline: 'African Cyber Battlefield Forum',
     description: 'Building a better future together through cybersecurity education and community empowerment.',
     longDescription: 'ACBF RSA is the official website for the African Cyber Battlefield Forum, a cybersecurity event and community platform. The site promotes cybersecurity awareness, provides educational resources, and facilitates community building among security professionals and enthusiasts in Africa.',
     thumbnail: '/images/projects/acbf.jpg',
@@ -142,7 +141,7 @@ const itemVariants = {
 
 export default function PortfolioDetailPage() {
   const { projectId } = useParams()
-  
+
   const project = projectId ? projectsData[projectId] : null
 
   if (!project) {
@@ -176,7 +175,7 @@ export default function PortfolioDetailPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
         </div>
-        
+
         <div className="relative z-10 container-custom h-full flex items-end pb-12">
           <motion.div variants={itemVariants} className="max-w-2xl">
             <Badge variant="secondary" className="mb-4">
@@ -217,7 +216,7 @@ export default function PortfolioDetailPage() {
           {/* Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-[200px]">
             {/* Main Hero Image */}
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               className={`lg:col-span-2 lg:row-span-2 rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 ${project.id === 'planzy' ? 'lg:row-span-3' : ''}`}
             >
@@ -235,7 +234,7 @@ export default function PortfolioDetailPage() {
             </motion.div>
 
             {/* Stats Cards */}
-            {project.stats.slice(0, 2).map((stat, index) => (
+            {project.stats.slice(0, 2).map((stat) => (
               <motion.div
                 key={stat.label}
                 variants={itemVariants}
@@ -287,7 +286,7 @@ export default function PortfolioDetailPage() {
             <p className="text-zinc-400">Built with modern tools and frameworks</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="flex flex-wrap justify-center gap-3"
           >

@@ -1,7 +1,6 @@
 import { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { MouseParallaxContainer, MouseParallaxChild } from 'react-parallax-mouse'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import FluidBackground from './FluidBackground'
 import { cn } from '@/lib/utils'
@@ -14,6 +13,23 @@ export interface HeroProps {
   ctaLink?: string
   image?: ReactNode
   className?: string
+}
+
+// Custom mouse parallax hook using Framer Motion
+function useMouseParallax(factor: number = 0.05) {
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+
+  // Add spring physics for smooth animation
+  const springConfig = { damping: 25, stiffness: 150 }
+  const springX = useSpring(mouseX, springConfig)
+  const springY = useSpring(mouseY, springConfig)
+
+  // Transform mouse position to offset
+  const x = useTransform(springX, (val) => val * factor)
+  const y = useTransform(springY, (val) => val * factor)
+
+  return { mouseX, mouseY, x, y }
 }
 
 const containerVariants = {
@@ -48,14 +64,32 @@ export default function Hero({
   image,
   className,
 }: HeroProps) {
+  // Mouse parallax for the full variant
+  const bgParallax = useMouseParallax(0.02)
+  const fgParallax = useMouseParallax(0.05)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
+    const mouseX = e.clientX - rect.left - centerX
+    const mouseY = e.clientY - rect.top - centerY
+
+    bgParallax.mouseX.set(mouseX)
+    bgParallax.mouseY.set(mouseY)
+    fgParallax.mouseX.set(mouseX)
+    fgParallax.mouseY.set(mouseY)
+  }
+
   if (variant === 'full') {
     return (
       <section
         data-testid="hero-full"
         className={cn('relative h-screen flex items-center justify-center overflow-hidden', className)}
+        onMouseMove={handleMouseMove}
       >
         {/* Hero background image */}
-        <div 
+        <div
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: 'url(/images/hero/hero-bg.jpg)',
@@ -65,28 +99,28 @@ export default function Hero({
         />
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 z-[1] bg-zinc-950/60" />
-        
+
         <FluidBackground className="z-[2] opacity-40" />
-        
-        <MouseParallaxContainer
+
+        {/* Parallax container */}
+        <div
+          data-testid="parallax-wrapper"
           className="absolute inset-0 w-full h-full"
-          globalFactorX={0.1}
-          globalFactorY={0.1}
         >
           {/* Background layer - moves slower */}
-          <MouseParallaxChild
-            factorX={0.02}
-            factorY={0.02}
+          <motion.div
+            data-testid="parallax-layer"
             className="absolute inset-0 z-0"
+            style={{ x: bgParallax.x, y: bgParallax.y }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-indigo-600/20" />
-          </MouseParallaxChild>
-          
+          </motion.div>
+
           {/* Foreground layer - moves faster */}
-          <MouseParallaxChild
-            factorX={0.05}
-            factorY={0.05}
+          <motion.div
+            data-testid="parallax-layer"
             className="absolute inset-0 z-10 flex items-center justify-center"
+            style={{ x: fgParallax.x, y: fgParallax.y }}
           >
             <motion.div
               variants={containerVariants}
@@ -100,14 +134,14 @@ export default function Hero({
               >
                 {title}
               </motion.h1>
-              
+
               <motion.p
                 variants={itemVariants}
                 className="text-xl md:text-2xl text-zinc-300 mb-8"
               >
                 {subtitle}
               </motion.p>
-              
+
               {ctaText && ctaLink && (
                 <motion.div variants={itemVariants}>
                   <Button asChild size="lg" className="text-lg px-8 py-6">
@@ -116,8 +150,8 @@ export default function Hero({
                 </motion.div>
               )}
             </motion.div>
-          </MouseParallaxChild>
-        </MouseParallaxContainer>
+          </motion.div>
+        </div>
       </section>
     )
   }
@@ -152,7 +186,7 @@ export default function Hero({
             </div>
           )}
         </motion.div>
-        
+
         {image && (
           <motion.div
             initial={{ opacity: 0, x: 20 }}

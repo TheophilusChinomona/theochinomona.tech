@@ -1,18 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import AppRoutes from '@/routes'
-
-// Mock react-parallax-mouse
-vi.mock('react-parallax-mouse', () => ({
-  MouseParallaxContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="parallax-wrapper">{children}</div>
-  ),
-  MouseParallaxChild: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="parallax-layer">{children}</div>
-  ),
-}))
 
 describe('Navigation Flow Integration', () => {
   it('navigates between all pages via navbar links', async () => {
@@ -75,7 +65,7 @@ describe('Navigation Flow Integration', () => {
 
   it('maintains navbar and footer on all pages', () => {
     const routes = ['/', '/about', '/portfolio', '/blog', '/contact']
-    
+
     routes.forEach((route) => {
       const { unmount } = render(
         <MemoryRouter initialEntries={[route]}>

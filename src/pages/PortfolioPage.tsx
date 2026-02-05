@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import Hero from '@/components/Hero'
 import ProjectCard, { type ProjectCardProps } from '@/components/ProjectCard'
 import { Button } from '@/components/ui/button'

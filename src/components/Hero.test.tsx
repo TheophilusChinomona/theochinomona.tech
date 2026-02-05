@@ -1,17 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import Hero from './Hero'
-
-// Mock react-parallax-mouse
-vi.mock('react-parallax-mouse', () => ({
-  MouseParallaxContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="parallax-wrapper">{children}</div>
-  ),
-  MouseParallaxChild: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="parallax-layer">{children}</div>
-  ),
-}))
 
 function renderWithRouter(ui: React.ReactElement) {
   return render(<BrowserRouter>{ui}</BrowserRouter>)
@@ -28,7 +18,7 @@ describe('Hero Component', () => {
         ctaLink="/contact"
       />
     )
-    
+
     const hero = screen.getByTestId('hero-full')
     expect(hero).toBeInTheDocument()
     expect(hero).toHaveClass('h-screen')
@@ -44,7 +34,7 @@ describe('Hero Component', () => {
         image={<div>Image</div>}
       />
     )
-    
+
     const hero = screen.getByTestId('hero-split')
     expect(hero).toBeInTheDocument()
     expect(hero).toHaveClass('md:grid-cols-2')
@@ -59,7 +49,7 @@ describe('Hero Component', () => {
         subtitle="My work"
       />
     )
-    
+
     const hero = screen.getByTestId('hero-minimal')
     expect(hero).toBeInTheDocument()
     expect(screen.getByText('Portfolio')).toBeInTheDocument()
@@ -70,16 +60,16 @@ describe('Hero Component', () => {
     const { rerender } = renderWithRouter(
       <Hero variant="full" title="Test Title" subtitle="Test Subtitle" />
     )
-    
+
     expect(screen.getByText('Test Title')).toBeInTheDocument()
     expect(screen.getByText('Test Subtitle')).toBeInTheDocument()
-    
+
     rerender(
       <BrowserRouter>
         <Hero variant="split" title="Split Title" subtitle="Split Subtitle" />
       </BrowserRouter>
     )
-    
+
     expect(screen.getByText('Split Title')).toBeInTheDocument()
     expect(screen.getByText('Split Subtitle')).toBeInTheDocument()
   })
@@ -94,7 +84,7 @@ describe('Hero Component', () => {
         ctaLink="/contact"
       />
     )
-    
+
     const ctaButton = screen.getByRole('link', { name: /contact me/i })
     expect(ctaButton).toBeInTheDocument()
     expect(ctaButton).toHaveAttribute('href', '/contact')
@@ -109,7 +99,7 @@ describe('Hero Component', () => {
         image={<div>Image</div>}
       />
     )
-    
+
     const hero = screen.getByTestId('hero-split')
     expect(hero).toHaveClass('md:grid-cols-2')
     expect(hero).toHaveClass('grid-cols-1')
