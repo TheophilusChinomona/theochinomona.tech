@@ -12,6 +12,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage'
 import TrackingLandingPage from './pages/TrackingLandingPage'
 import TrackingPage from './pages/TrackingPage'
 import SetPasswordPage from './pages/SetPasswordPage'
+import NotFoundPage from './pages/NotFoundPage'
 import AdminDashboardOverview from './pages/admin/DashboardOverview'
 import AdminUserList from './pages/admin/UserList'
 import ProjectList from './pages/admin/ProjectList'
@@ -116,6 +117,9 @@ export default function AppRoutes() {
         <Route path="settings" element={<ClientSettingsPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
       </Route>
+
+      {/* 404 Page - must be last */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
