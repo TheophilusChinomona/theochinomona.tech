@@ -21,24 +21,27 @@ const skills = [
 const featuredProjects = [
   {
     id: '1',
-    title: 'E-Commerce Platform',
-    description: 'Full-stack e-commerce solution with payment integration',
-    tech: ['React', 'Node.js', 'PostgreSQL'],
-    thumbnail: '/images/projects/ecommerce.jpg',
+    title: 'Planzy Studio',
+    description: 'Creative agency portfolio with modern design and project showcase',
+    tech: ['React', 'Tailwind', 'Animations'],
+    thumbnail: '/images/projects/planzy.jpg',
+    link: 'https://planzy.theochinomona.tech',
   },
   {
     id: '2',
-    title: 'Task Management App',
-    description: 'Collaborative task management with real-time updates',
-    tech: ['React', 'TypeScript', 'WebSocket'],
-    thumbnail: '/images/projects/task-management.jpg',
+    title: 'IBStrategies',
+    description: 'Business consulting firm website with professional branding',
+    tech: ['React', 'TypeScript', 'CMS'],
+    thumbnail: '/images/projects/ibstrategies.jpg',
+    link: 'https://ibstrategies.co.za',
   },
   {
     id: '3',
-    title: 'Portfolio Website',
-    description: 'Modern portfolio site with dark theme and animations',
-    tech: ['React', 'Tailwind', 'Framer Motion'],
-    thumbnail: '/images/projects/portfolio.jpg',
+    title: 'ACBF',
+    description: 'African Cyber Battlefield Forum - cybersecurity event platform',
+    tech: ['React', 'Node.js', 'Events'],
+    thumbnail: '/images/projects/acbf.jpg',
+    link: 'https://acbf.org.za',
   },
 ]
 
@@ -110,6 +113,19 @@ export default function HomePage() {
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                    {project.link && (
+                      <a
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900/60"
+                      >
+                        <span className="flex items-center gap-2 px-4 py-2 bg-white text-zinc-900 rounded-lg font-medium">
+                          <ExternalLink className="w-4 h-4" />
+                          View Project
+                        </span>
+                      </a>
+                    )}
                   </div>
                 )}
                 <CardHeader>
