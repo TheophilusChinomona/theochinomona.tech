@@ -77,6 +77,7 @@ export default function PortfolioPage() {
         thumbnail: project.thumbnail || undefined,
         tech: project.tech,
         category: project.category,
+        href: `/portfolio/${project.id}`,
         client_name: project.client_name || undefined,
         project_url: project.project_url || undefined,
         github_url: project.github_url || undefined,
@@ -88,7 +89,10 @@ export default function PortfolioPage() {
 
   // Merge portfolio projects and database projects
   const allProjects = useMemo(
-    () => [...portfolioProjects, ...dbProjectsFormatted],
+    () => [
+      ...portfolioProjects.map(p => ({ ...p, href: `/portfolio/${p.id.replace('portfolio-', '')}` })),
+      ...dbProjectsFormatted
+    ],
     [dbProjectsFormatted]
   )
 
