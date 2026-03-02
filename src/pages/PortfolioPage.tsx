@@ -45,6 +45,43 @@ const portfolioProjects: ProjectCardProps[] = [
     category: 'Web',
     thumbnail: '/images/projects/acbf.jpg',
   },
+  {
+    id: 'portfolio-blackeagle',
+    title: 'Black Eagle Group',
+    description: 'Corporate website for a diversified business group, featuring modern design with a React + Vite frontend and Strapi CMS for content management.',
+    tech: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Strapi CMS'],
+    category: 'Full-Stack',
+    thumbnail: '/images/projects/blackeagle.jpg',
+    github_url: 'https://github.com/TheophilusChinomona/blackeaglegroup',
+    project_url: 'https://blackeaglegroup.co.za',
+  },
+  {
+    id: 'portfolio-ironwoodbc',
+    title: 'Ironwood BC',
+    description: 'Business consulting website built with Next.js and React, delivering a clean professional presence for Ironwood Business Consulting.',
+    tech: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+    category: 'Web',
+    thumbnail: '/images/projects/ironwoodbc.jpg',
+    github_url: 'https://github.com/TheophilusChinomona/ironwoodbc',
+  },
+  {
+    id: 'portfolio-pmsimulator',
+    title: 'PM Simulator 2',
+    description: 'An interactive project management simulation game — players navigate real-world PM scenarios and decisions in a gamified environment.',
+    tech: ['React', 'TypeScript', 'Node.js', 'Vite'],
+    category: 'Full-Stack',
+    thumbnail: '/images/projects/pm-simulator2.jpg',
+    github_url: 'https://github.com/TheophilusChinomona/pm-simulator2',
+  },
+  {
+    id: 'portfolio-planzee',
+    title: 'Planzee',
+    description: 'Landing page for Planzee, a project planning SaaS product, built with Next.js and featuring a polished, conversion-focused design.',
+    tech: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
+    category: 'Web',
+    thumbnail: '/images/projects/planzee.jpg',
+    github_url: 'https://github.com/TheophilusChinomona/planzee-landing',
+  },
 ]
 
 type SortOption = 'newest' | 'alphabetical' | 'featured'
