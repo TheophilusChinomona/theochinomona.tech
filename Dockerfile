@@ -3,12 +3,13 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Build args for Vite env vars
+# Build args for Vite env vars (with fallback to runtime env for flexibility)
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 # Convert build args to environment variables for Vite
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+# Use build args if provided, otherwise fallback to runtime env (for local development)
+ENV VITE_SUPABASE_URL=${VITE_SUPABASE_URL:-""}
+ENV VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY:-""}
 
 # Copy package files first for better caching
 COPY package*.json ./
