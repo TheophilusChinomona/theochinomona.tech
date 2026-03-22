@@ -6,6 +6,9 @@ WORKDIR /app
 # Build args for Vite env vars
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
+# Convert build args to environment variables for Vite
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 
 # Copy package files first for better caching
 COPY package*.json ./
